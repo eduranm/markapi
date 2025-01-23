@@ -24,6 +24,7 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # core/
 APPS_DIR = ROOT_DIR / "core"
+LLAMA_MODEL_DIR = ROOT_DIR / "llama3/llama-3.2"
 
 env = environ.Env()
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
