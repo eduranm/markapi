@@ -40,3 +40,8 @@ kombu==5.4.2
 tenacity==8.2.3  # https://pypi.org/project/tenacity/
 
 whitenoise==6.6.0  # https://github.com/evansd/whitenoise
+
+# Llama
+# ------------------------------------------------------------------------------
+huggingface-hub==0.26.1
+llama-cpp-python==0.3.1
