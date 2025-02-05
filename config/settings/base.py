@@ -45,6 +45,7 @@ WAGTAIL = [
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     'wagtail.contrib.settings',
+    "wagtail_modeladmin",
     "wagtail.embeds",
     "wagtail.sites",
     "wagtail.users",
@@ -65,6 +66,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_celery_results"
 ]
 
 THIRD_PARTY_APPS = [
@@ -78,6 +80,7 @@ LOCAL_APPS = [
     "core_settings",
     "django_celery_beat",
     "tracker",
+    "reference"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + WAGTAIL
