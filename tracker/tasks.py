@@ -4,7 +4,7 @@ import sys
 from datetime import datetime
 
 from config import celery_app
-from .models import UnexpectedEvent, Hello
+from .models import UnexpectedEvent
 
 
 @celery_app.task(bind=True, name="cleanup_unexpected_events")

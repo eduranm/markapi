@@ -1,6 +1,6 @@
 from llama3.generic_llama import GenericLlama
 
-from reference.config import MESSAGE, RESPONSE_FORMAT
+from reference.config import MESSAGES, RESPONSE_FORMAT
 
 
 reference_marker = GenericLlama(MESSAGES, RESPONSE_FORMAT)
