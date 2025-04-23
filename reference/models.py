@@ -32,6 +32,7 @@ class ElementCitation(Orderable):
         Reference, on_delete=models.SET_NULL, related_name="element_citation", null=True
     )
     marked = models.JSONField(_("Marked"), default=dict, blank=True)
+    marked_xml = models.TextField(_("Marked XML"), blank=True)
 
     score = models.IntegerField(
         null=True, 
@@ -45,5 +46,6 @@ class ElementCitation(Orderable):
 
     panels = [
             FieldPanel("marked"),
+            FieldPanel("marked_xml"),
             FieldPanel("score"),
             ]
