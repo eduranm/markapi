@@ -7,3 +7,5 @@ watchgod==0.8.2  # https://github.com/samuelcolvin/watchgod
 
 django-extensions==3.2.3  # https://github.com/django-extensions/django-extensions
 django-debug-toolbar  # https://github.com/jazzband/django-debug-toolbar
+
+pytest >= 7.0.7

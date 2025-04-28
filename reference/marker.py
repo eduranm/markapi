@@ -3,10 +3,8 @@ from llama3.generic_llama import GenericLlama
 from reference.config import MESSAGES, RESPONSE_FORMAT
 
 
-reference_marker = GenericLlama(MESSAGES, RESPONSE_FORMAT)
-
-
 def mark_reference(reference_text):
+    reference_marker = GenericLlama(MESSAGES, RESPONSE_FORMAT)
     output = reference_marker.run(reference_text)
     # output['choices'][0]['message']['content']
     for item in output["choices"]:
