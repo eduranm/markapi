@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: secrets-markapi-hml
+  namespace: markapi-hml
+  labels:
+    k8slens-edit-resource-version: v1
+spec: {}
+data:
+  CELERY_BROKER_URL: redis://redis:6379/0
+  CELERY_FLOWER_PASSWORD:
+  CELERY_FLOWER_USER:
+  DATABASE_URL:
+  DJANGO_ADMIN_URL: django-admin/
+  DJANGO_ALLOWED_HOSTS: '*'
+  DJANGO_DEBUG: 'True'
+  DJANGO_DEFAULT_FROM_EMAIL:
+  DJANGO_EMAIL_SUBJECT_PREFIX: '[MARKAPI-HML]'
+  DJANGO_SECRET_KEY: 
+  DJANGO_SETTINGS_MODULE: config.settings.production
+  EMAIL_HOST: smtp.gmail.com
+  EMAIL_HOST_PASSWORD: 
+  EMAIL_HOST_USER:
+  EMAIL_PORT: '587'
+  EMAIL_USE_TLS: 'True'
+  IPYTHONDIR: /app/.ipython
+  MAINTENANCE_MODE: 'False'
+  REDIS_URL: redis://redis:6379/0
+  SENTRY_DSN:
+  USE_DOCKER: 'yes'
+  WAGTAILADMIN_BASE_URL: https://hml-markapi.scielo.org
+  WAGTAIL_ADMIN_URL: admin/
+  HF_TOKEN:
