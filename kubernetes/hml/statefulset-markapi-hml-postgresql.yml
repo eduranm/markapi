@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: markapi-hml-postgres
+  namespace: markapi-hml
+  generation: 1
+  annotations:
+  selfLink: /apis/apps/v1/namespaces/markapi-hml/statefulsets/markapi-hml-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: markapi-hml-postgres
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: markapi-hml-postgres
+    spec:
+      volumes:
+        - name: markapi-hml-postgres-data
+          persistentVolumeClaim:
+            claimName: markapi-hml-postgres-pvc
+      containers:
+        - name: postgres
+          image: postgres:15.3
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: configmap-markapi-hml
+          resources: {}
+          volumeMounts:
+            - name: markapi-hml-postgres-data
+              mountPath: /var/lib/postgresql/data
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      serviceAccountName: postgres
+      serviceAccount: postgres
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999
+      schedulerName: default-scheduler
+      tolerations:
+        - key: app
+          operator: Equal
+          value: producao
+          effect: NoSchedule
+  serviceName: markapi-hml-postgres
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  revisionHistoryLimit: 10

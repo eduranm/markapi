@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: markapi-hml
+  generation: 1
+  labels:
+    k8slens-edit-resource-version: v1
+  annotations:
+  selfLink: /apis/apps/v1/namespaces/markapi-hml/statefulsets/redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      env: markapi-hml
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: redis
+        env: markapi-hml
+    spec:
+      volumes:
+        - name: markapi-hml-redis
+          persistentVolumeClaim:
+            claimName: markapi-hml-redis-pvclaim
+      containers:
+        - name: redis
+          image: redis:7.2
+          resources: {}
+          volumeMounts:
+            - name: markapi-hml-redis
+              mountPath: /data
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      serviceAccountName: redis
+      serviceAccount: redis
+      securityContext:
+        runAsUser: 1001
+        fsGroup: 1001
+      schedulerName: default-scheduler
+      tolerations:
+        - key: app
+          operator: Equal
+          value: producao
+          effect: NoSchedule
+  serviceName: redis
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  revisionHistoryLimit: 10
