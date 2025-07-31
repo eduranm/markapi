@@ -26,7 +26,6 @@ RUN python -m pip install --upgrade pip
 RUN pip wheel --wheel-dir /usr/src/app/wheels  \
   -r ${BUILD_ENVIRONMENT}.txt
 
-
 # Python 'run' stage
 FROM python as python-run-stage
 
@@ -36,6 +35,12 @@ ARG APP_HOME=/app
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV BUILD_ENV ${BUILD_ENVIRONMENT}
+
+# Install llama-cpp-python with specific CMAKE flags for Kubernetes nodes without AVX support
+ARG DISABLE_AVX=true
+
+# Set the version of llama-cpp-python
+ARG LLAMA_VERSION=0.3.14
 
 WORKDIR ${APP_HOME}
 
