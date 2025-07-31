@@ -40,4 +40,4 @@ whitenoise==6.6.0  # https://github.com/evansd/whitenoise
 # Llama
 # ------------------------------------------------------------------------------
 huggingface-hub==0.26.1
-llama-cpp-python==0.3.1
+llama-cpp-python==0.3.14
