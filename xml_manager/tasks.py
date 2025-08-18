@@ -64,3 +64,31 @@ def task_validate_xml_file(self, xml_id, user_id=None, username=None):
     xml_file.exceptions_file = path_exceptions
     xml_file.save()
     logging.info(f'XML validation completed successfully for {xml_file.xml_file.name}.')
+
+
+@celery_app.task(bind=True, name=_('Generate HTML File'), timelimit=-1)
+def task_generate_pdf_file(self, xml_id, user_id=None, username=None):
+    user = _get_user(self.request, username=username, user_id=user_id)
+    
+    try:
+        xml_file = XMLDocument.objects.get(id=xml_id)
+    except XMLDocument.DoesNotExist:
+        logging.error(f'XML file with ID {xml_id} does not exist.')
+        return False
+    
+    logging.info(f'Starting PDF generation for XML file {xml_file.xml_file.name}.')
+    # TODO: Implement PDF generation logic here
+
+
+@celery_app.task(bind=True, name=_('Generate HTML File'), timelimit=-1)
+def task_generate_html_file(self, xml_id, user_id=None, username=None):
+    user = _get_user(self.request, username=username, user_id=user_id)
+    
+    try:
+        xml_file = XMLDocument.objects.get(id=xml_id)
+    except XMLDocument.DoesNotExist:
+        logging.error(f'XML file with ID {xml_id} does not exist.')
+        return False
+    
+    logging.info(f'Starting HTML generation for XML file {xml_file.xml_file.name}.')
+    # TODO: Implement HTML generation logic here
