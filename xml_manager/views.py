@@ -13,7 +13,6 @@ def upload_xml_page(request):
 
 
 @require_POST
-@csrf_exempt
 def process_xml(request):
     xml_file = request.FILES.get('xml_file')
     if not xml_file:
