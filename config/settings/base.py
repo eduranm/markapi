@@ -80,7 +80,8 @@ LOCAL_APPS = [
     "core_settings",
     "django_celery_beat",
     "tracker",
-    "reference"
+    "reference",
+    "xml_manager",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + WAGTAIL
