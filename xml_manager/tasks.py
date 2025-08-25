@@ -16,10 +16,18 @@ from .models import XMLDocument
 User = get_user_model()
 
 
+def _get_user(request, username=None, user_id=None):
+    try:
+        return User.objects.get(pk=request.user_id)
+    except AttributeError:
+        if user_id:
+            return User.objects.get(pk=user_id)
+        if username:
+            return User.objects.get(username=username)
+
+
 @celery_app.task(bind=True, timelimit=-1)
 def task_process_xml_document(self, xml_id, user_id=None, username=None):
-    user = _get_user(self.request, username=username, user_id=user_id)
-
     try:
         xml_document = XMLDocument.objects.get(id=xml_id)
     except XMLDocument.DoesNotExist:
@@ -36,13 +44,13 @@ def task_process_xml_document(self, xml_id, user_id=None, username=None):
 
 @celery_app.task(bind=True, timelimit=-1)
 def task_validate_xml_file(self, xml_id, user_id=None, username=None):
-    user = _get_user(self.request, username=username, user_id=user_id)
-
     try:
         xml_file = XMLDocument.objects.get(id=xml_id)
     except XMLDocument.DoesNotExist:
         logging.error(f'XML file with ID {xml_id} does not exist.')
         return False
+    
+    user = _get_user(self.request, username=username, user_id=user_id)
     
     logging.info(f'Starting XML validation for XML file {xml_file.xml_file.name}.')
     params = {}
@@ -67,28 +75,28 @@ def task_validate_xml_file(self, xml_id, user_id=None, username=None):
 
 
 @celery_app.task(bind=True, timelimit=-1)
-def task_generate_pdf_file(self, xml_id, user_id=None, username=None):
-    user = _get_user(self.request, username=username, user_id=user_id)
-    
+def task_generate_pdf_file(self, xml_id, user_id=None, username=None):    
     try:
         xml_file = XMLDocument.objects.get(id=xml_id)
     except XMLDocument.DoesNotExist:
         logging.error(f'XML file with ID {xml_id} does not exist.')
         return False
+    
+    user = _get_user(self.request, username=username, user_id=user_id)
     
     logging.info(f'Starting PDF generation for XML file {xml_file.xml_file.name}.')
     # TODO: Implement PDF generation logic here
 
 
 @celery_app.task(bind=True, timelimit=-1)
-def task_generate_html_file(self, xml_id, user_id=None, username=None):
-    user = _get_user(self.request, username=username, user_id=user_id)
-    
+def task_generate_html_file(self, xml_id, user_id=None, username=None):    
     try:
         xml_file = XMLDocument.objects.get(id=xml_id)
     except XMLDocument.DoesNotExist:
         logging.error(f'XML file with ID {xml_id} does not exist.')
         return False
+    
+    user = _get_user(self.request, username=username, user_id=user_id)
     
     logging.info(f'Starting HTML generation for XML file {xml_file.xml_file.name}.')
     # TODO: Implement HTML generation logic here
