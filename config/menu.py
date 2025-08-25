@@ -1,4 +1,7 @@
 WAGTAIL_MENU_APPS_ORDER = [
+    "xml_manager",
+    "reference",
+    "tracker",
     "django_celery_beat",
 ]
 
