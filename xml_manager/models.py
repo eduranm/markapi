@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from wagtail.admin.panels import FieldPanel
 
 
 class XMLDocument(models.Model):
@@ -9,13 +10,13 @@ class XMLDocument(models.Model):
         help_text=_("Upload an XML file for processing.")
     )
     validation_file = models.FileField(
-        upload_to='xml_manager/csv/',
+        upload_to='xml_manager/validation/',
         blank=True,
         null=True,
         verbose_name=_("Validation File")
     )
     exceptions_file = models.FileField(
-        upload_to='xml_manager/exceptions/',
+        upload_to='xml_manager/validation/',
         blank=True,
         null=True,
         verbose_name=_("Exceptions File")
@@ -25,6 +26,17 @@ class XMLDocument(models.Model):
         verbose_name=_("Uploaded At"),
         help_text=_("The date and time when the file was uploaded.")
     )
+
+    panels = [
+        FieldPanel("xml_file"),
+    ]
+
+    def __str__(self):
+        return f"{self.xml_file.name}"
+        
+    class Meta:
+        verbose_name = _("XML Document")
+        verbose_name_plural = _("XML Documents")
 
 
 class XMLDocumentPDF(models.Model):
@@ -41,6 +53,23 @@ class XMLDocumentPDF(models.Model):
     )
     uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Uploaded At"))
 
+    def __str__(self):
+        return f"PDF for {self.xml_document.xml_file.name} ({self.language})"
+    
+    class Meta:
+        verbose_name = _("XML Document PDF")
+        verbose_name_plural = _("XML Document PDFs")
+
+    @classmethod
+    def create(cls, xml_document, pdf_file, language="pt"):
+        pdf_instance = cls(
+            xml_document=xml_document, 
+            pdf_file=pdf_file, 
+            language=language
+        )
+        pdf_instance.save()
+        return pdf_instance
+
 
 class XMLDocumentHTML(models.Model):
     xml_document = models.ForeignKey(XMLDocument, on_delete=models.CASCADE, related_name="htmls", verbose_name=_("XML Document"))
@@ -55,3 +84,20 @@ class XMLDocumentHTML(models.Model):
         help_text=_("Language code or name")
     )
     uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Uploaded At"))
+
+    def __str__(self):
+        return f"HTML for {self.xml_document.xml_file.name} ({self.language})"
+    
+    class Meta:
+        verbose_name = _("XML Document HTML")
+        verbose_name_plural = _("XML Document HTMLs")
+
+    @classmethod
+    def create(cls, xml_document, html_file, language="pt"):
+        html_instance = cls(
+            xml_document=xml_document, 
+            html_file=html_file, 
+            language=language
+        )
+        html_instance.save()
+        return html_instance
