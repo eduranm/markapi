@@ -41,3 +41,11 @@ whitenoise==6.6.0  # https://github.com/evansd/whitenoise
 # ------------------------------------------------------------------------------
 huggingface-hub==0.26.1
 llama-cpp-python==0.3.14
+
+# Packtools
+# ------------------------------------------------------------------------------
+git+https://git@github.com/scieloorg/packtools@4.11.20#egg=packtools
+
+# Langdetect
+# ------------------------------------------------------------------------------
+langdetect~=1.0.9
