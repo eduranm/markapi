@@ -84,7 +84,10 @@ class XMLDocumentPDFSnippetViewSet(SnippetViewSet):
 
     list_display = (
         "xml_document",
-        "pdf_file",    
+        LinkColumn("pdf_file", "PDF file"),
+        LinkColumn("docx_file", "DOCX file"),
+        "language",
+        "uploaded_at"
     )
 
     search_fields = ("pdf_file",)
@@ -102,11 +105,12 @@ class XMLDocumentHTMLSnippetViewSet(SnippetViewSet):
 
     list_display = (
         "xml_document",
-        "html_file",    
+        LinkColumn("html_file", "HTML file"),
+        "language",
+        "uploaded_at",
     )
 
     search_fields = ("html_file",)
-
 
 
 class XMLDocumentSnippetViewSetGroup(SnippetViewSetGroup):
