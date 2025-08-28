@@ -19,6 +19,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements .
 
+# Create application directory to hold DOCX layouts
+COPY ./docx_layouts .
+
 # Update pip
 RUN python -m pip install --upgrade pip
 
