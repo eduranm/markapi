@@ -45,6 +45,13 @@ class XMLDocumentPDF(models.Model):
         upload_to='xml_manager/pdf/',
         verbose_name=_("PDF File")
     )
+    docx_file = models.FileField(
+        upload_to='xml_manager/docx/',
+        verbose_name=_("DOCX File"),
+        null=True,
+        blank=True,
+        help_text=_('Intermediate DOCX file generated during PDF creation')
+    )
     language = models.CharField(
         max_length=32,
         default="pt",
