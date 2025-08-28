@@ -1,14 +1,7 @@
 import logging
 import os
-import tempfile
 
-from packtools import data_checker
-from packtools.sps.formats.pdf.pipeline import docx
-from packtools.sps.formats.pdf.utils import file_utils
-from packtools.sps.utils import xml_utils
-from django.core.files import File
 from django.conf import settings
-
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 
@@ -17,16 +10,18 @@ from tracker.choices import (
     XML_DOCUMENT_PARSING_ERROR,
     XML_DOCUMENT_VALIDATION_ERROR,
     XML_DOCUMENT_CONVERSION_TO_DOCX_ERROR,
+    XML_DOCUMENT_CONVERSION_TO_HTML_ERROR,
     XML_DOCUMENT_CONVERSION_TO_PDF_ERROR,
-    XML_DOCUMENT_CONVERSION_TO_TEX_ERROR,
+    XML_DOCUMENT_UNKNOWN_ERROR,
 )
 from tracker.models import XMLDocumentEvent
-
-from .models import (
+from xml_manager.models import (
     XMLDocument, 
     XMLDocumentHTML, 
     XMLDocumentPDF,
 )
+from xml_manager import exceptions
+from xml_manager import utils
 
 
 User = get_user_model()
