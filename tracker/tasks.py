@@ -1,16 +1,13 @@
-# tasks.py
-import logging
-import sys
 from datetime import datetime
 
 from config import celery_app
-from .models import UnexpectedEvent
+from .models import GeneralEvent
 
 
-@celery_app.task(bind=True, name="cleanup_unexpected_events")
-def delete_unexpected_events(self, exception_type, start_date=None, end_date=None, user_id=None, username=None):
+@celery_app.task(bind=True)
+def delete_general_events(self, exception_type, start_date=None, end_date=None, user_id=None, username=None):
     """
-    Delete UnexpectedEvent records based on exception type and optional date range.
+    Delete GeneralEvent records based on exception type and optional date range.
     """
 
     filters = {}
@@ -24,4 +21,4 @@ def delete_unexpected_events(self, exception_type, start_date=None, end_date=Non
         end_date = datetime.fromisoformat(end_date)
         filters['created__lte'] = end_date
 
-    UnexpectedEvent.objects.filter(**filters).delete()
+    GeneralEvent.objects.filter(**filters).delete()

@@ -2,23 +2,76 @@ import json
 import logging
 import traceback
 import uuid
-from datetime import datetime
 
-from django.core.files.base import ContentFile
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from core.models import CommonControlField
+from xml_manager.models import XMLDocument
 from tracker import choices
+
 from .exceptions import (
-    EventCreateError,
-    EventReportCreateError,
-    EventReportSaveFileError,
-    UnexpectedEventCreateError
+    GeneralEventCreateError,
+    XMLDocumentEventCreateError,
 )
 
 
-class UnexpectedEvent(models.Model):
+class XMLDocumentEvent(CommonControlField):
+    xml_document = models.ForeignKey(
+        XMLDocument, 
+        on_delete=models.CASCADE, 
+        null=False, 
+        blank=False,
+        db_index=True,
+    )
+    error_type = models.CharField(
+        _("Error Type"),
+        choices=choices.XML_DOCUMENT_EVENT,
+        max_length=3,
+        null=True,
+        blank=True,
+    )
+    data = models.JSONField(
+        _("Data"),
+        default=dict,
+    )
+    message = models.TextField(
+        _("Message"),
+        null=True,
+        blank=True,
+    )
+    handled = models.BooleanField(
+        _("Handled"),
+        default=False
+    )
+
+    @classmethod
+    def create(cls, xml_document, error_type, data, message, save=False):
+        try:
+            obj = cls()
+            obj.xml_document = xml_document
+            obj.error_type = error_type
+            obj.data = data
+            obj.message = message
+            if save:
+                obj.save()
+
+            return obj
+
+        except Exception as exc:
+            raise XMLDocumentEventCreateError(
+                f"Unable to create XMLDocumentEvent. EXCEPTION {exc}"
+            )
+
+    def __str__(self):
+        return f"{self.data} - {self.message}"
+    
+    class Meta:
+        verbose_name = _("XML Document Event")
+        verbose_name_plural = _("XML Document Events")
+
+
+class GeneralEvent(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created = models.DateTimeField(verbose_name=_("Creation date"), auto_now_add=True)
     exception_type = models.TextField(_("Exception Type"), null=True, blank=True)
@@ -45,6 +98,8 @@ class UnexpectedEvent(models.Model):
             models.Index(fields=["action"]),
         ]
         ordering = ["-created"]
+    verbose_name = _("General Event")
+    verbose_name_plural = _("General Events")
 
     def __str__(self):
         if self.item or self.action:
@@ -92,125 +147,6 @@ class UnexpectedEvent(models.Model):
             obj.save()
             return obj
         except Exception as exc:
-            raise UnexpectedEventCreateError(
-                f"Unable to create unexpected event ({exception} {exc_traceback}). EXCEPTION {exc}"
-            )
-
-
-class Event(CommonControlField):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    message = models.TextField(_("Message"), null=True, blank=True)
-    message_type = models.CharField(
-        _("Message type"),
-        choices=choices.EVENT_MSG_TYPE,
-        max_length=16,
-        null=True,
-        blank=True,
-    )
-    detail = models.JSONField(null=True, blank=True)
-    unexpected_event = models.ForeignKey(
-        UnexpectedEvent, on_delete=models.SET_NULL, null=True, blank=True
-    )
-
-    class Meta:
-        abstract = True
-        indexes = [
-            models.Index(fields=["message_type"]),
-        ]
-
-    @property
-    def data(self):
-        d = {}
-        d["created"] = self.created.isoformat()
-        d["user"] = self.user.username
-        d.update(
-            dict(
-                message=self.message, message_type=self.message_type, detail=self.detail
-            )
-        )
-        if self.unexpected_event:
-            d.update(self.unexpected_event.data)
-        return d
-
-    @classmethod
-    def create(
-        cls,
-        user=None,
-        message_type=None,
-        message=None,
-        e=None,
-        exc_traceback=None,
-        detail=None,
-    ):
-        try:
-            obj = cls()
-            obj.creator = user
-            obj.message = message
-            obj.message_type = message_type
-            obj.detail = detail
-            obj.save()
-
-            if e:
-                logging.exception(f"{message}: {e}")
-                obj.unexpected_event = UnexpectedEvent.create(
-                    exception=e,
-                    exc_traceback=exc_traceback,
-                )
-                obj.save()
-        except Exception as exc:
-            raise EventCreateError(
-                f"Unable to create Event ({message} {e}). EXCEPTION: {exc}"
-            )
-        return obj
-
-
-def tracker_file_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-
-    d = datetime.utcnow()
-    return f"tracker/{d.year}/{d.month}/{d.day}/{filename}"
-
-
-class EventReport(CommonControlField):
-    file = models.FileField(
-        upload_to=tracker_file_directory_path, null=True, blank=True
-    )
-
-    class Meta:
-        abstract = True
-
-    def save_file(self, events, ext=None):
-        if not events:
-            return
-        try:
-            ext = ".json"
-            content = json.dumps(list([item.data for item in events]))
-            name = datetime.utcnow().isoformat() + ext
-            self.file.save(name, ContentFile(content))
-            self.delete_events(events)
-        except Exception as e:
-            raise EventReportSaveFileError(
-                f"Unable to save EventReport.file ({name}). Exception: {e}"
-            )
-
-    def delete_events(self, events):
-        for item in events:
-            try:
-                item.unexpected_event.delete()
-            except:
-                pass
-            try:
-                item.delete()
-            except:
-                pass
-
-    @classmethod
-    def create(cls, user):
-        try:
-            obj = cls()
-            obj.creator = user
-            obj.save()
-        except Exception as e:
-            raise EventReportCreateError(
-                f"Unable to create EventReport. Exception: {e}"
+            raise GeneralEventCreateError(
+                f"Unable to create general event ({exception} {exc_traceback}). EXCEPTION {exc}"
             )

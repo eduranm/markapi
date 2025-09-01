@@ -19,6 +19,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements .
 
+# Create application directory to hold DOCX layouts
+COPY ./docx_layouts .
+
 # Update pip
 RUN python -m pip install --upgrade pip
 
@@ -47,10 +50,14 @@ WORKDIR ${APP_HOME}
 RUN addgroup --system django \
     && adduser --system --ingroup django django
 
+RUN sed -i 's/main/main contrib non-free/' /etc/apt/sources.list
+    
 # Install required system dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \
   # psycopg2 dependencies
   libpq-dev \
+  # libreoffice for document conversions
+  default-jre libreoffice libreoffice-java-common ttf-mscorefonts-installer fonts-liberation fonts-liberation2 fonts-crosextra-carlito fonts-crosextra-caladea fonts-dejavu fonts-noto \
   # Translations dependencies
   gettext \
   # cleaning up unused files

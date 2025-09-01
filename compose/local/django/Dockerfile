@@ -43,6 +43,9 @@ RUN python -m pip install --upgrade pip setuptools wheel
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements .
 
+# Create application directory to hold DOCX layouts
+COPY ./docx_layouts .
+
 # Update pip
 RUN python -m pip install --upgrade pip
 
@@ -68,12 +71,16 @@ ARG LLAMA_VERSION=0.3.14
 
 WORKDIR ${APP_HOME}
 
+RUN sed -i 's/main/main contrib non-free/' /etc/apt/sources.list
+
 # Install required system dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \
   # psycopg2 dependencies
   libpq-dev \
   # Translations dependencies
   gettext \
+  # libreoffice for document conversions
+  default-jre libreoffice libreoffice-java-common ttf-mscorefonts-installer fonts-liberation fonts-liberation2 fonts-crosextra-carlito fonts-crosextra-caladea fonts-dejavu fonts-noto \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
