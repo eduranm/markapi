@@ -66,7 +66,7 @@ class XMLDocumentSnippetViewSet(SnippetViewSet):
         LinkColumn("validation_file", label=_("Validation file")),
         LinkColumn("exceptions_file", label=_("Exceptions file")),
         "uploaded_at",
-        ActionColumn("actions", label=_("Ações")),
+        ActionColumn("actions", label=_("Action")),
     )
 
     search_fields = ("xml_file",)
