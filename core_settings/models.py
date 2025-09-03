@@ -15,8 +15,8 @@ class CustomSettings(BaseSiteSetting):
     """
 
     class Meta:
-        verbose_name = _("Configuração do site")
-        verbose_name_plural = _("Configuração do site")
+        verbose_name = _("Site configuration")
+        verbose_name_plural = _("Site configuration")
 
     name = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(max_length=100, null=True, blank=True)
