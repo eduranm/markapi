@@ -573,7 +573,7 @@ class PeriodicTask(models.Model):
 
     content_panels = [
         HelpPanel(
-            _("Essa é a área de configuração de execução de tarefas assíncronas.")
+            _("This is the configuration area for executing asynchronous tasks.")
         ),
         FieldPanel("name"),
         FieldPanel("regtask"),
