@@ -6,13 +6,13 @@ from wagtail.models import Orderable
 from wagtail.admin.panels import FieldPanel, InlinePanel
 from modelcluster.fields import ParentalKey
 from modelcluster.models import ClusterableModel
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from core.forms import CoreAdminModelForm
 
 # Create your models here
 class Reference(CommonControlField, ClusterableModel):
-    mixed_citation = models.TextField(("Mixed Citation"), null=False, blank=True)
+    mixed_citation = models.TextField(_("Mixed Citation"), null=False, blank=True)
 
     estatus = models.IntegerField(default=0) 
 
@@ -25,6 +25,10 @@ class Reference(CommonControlField, ClusterableModel):
 
     def __str__(self):
         return self.mixed_citation
+
+    class Meta:
+        verbose_name = _("Referência")
+        verbose_name_plural = _("Referências")
 
 
 class ElementCitation(Orderable):
@@ -41,7 +45,7 @@ class ElementCitation(Orderable):
             MinValueValidator(1),  # Mínimo 1
             MaxValueValidator(10)  # Máximo 10
         ],
-        help_text="Rating from 1 to 10"
+        help_text=_("Rating from 1 to 10")
     )
 
     panels = [
