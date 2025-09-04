@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-03 12:15+0000\n"
+"POT-Creation-Date: 2025-09-04 14:18+0000\n"
 "PO-Revision-Date: 2025-09-03 HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English <en@li.org>\n"
@@ -611,13 +611,33 @@ msgstr "Task {0} was successfully run"
 msgid "Tasks"
 msgstr "Tasks"
 
-#: reference/models.py:34
+#: reference/models.py:15
+msgid "Mixed Citation"
+msgstr "Mixed Citation"
+
+#: reference/models.py:30
+#, fuzzy
+#| msgid "Reference"
+msgid "Referência"
+msgstr "Reference"
+
+#: reference/models.py:31
+#, fuzzy
+#| msgid "Reference"
+msgid "Referências"
+msgstr "Reference"
+
+#: reference/models.py:38
 msgid "Marked"
 msgstr "Marked"
 
-#: reference/models.py:35
+#: reference/models.py:39
 msgid "Marked XML"
 msgstr "Marked XML"
+
+#: reference/models.py:48
+msgid "Rating from 1 to 10"
+msgstr "Rating from 1 to 10"
 
 #: reference/wagtail_hooks.py:45
 msgid "Reference"
@@ -849,6 +869,19 @@ msgstr "Exceptions file"
 #: xml_manager/wagtail_hooks.py:118
 msgid "XML Manager"
 msgstr "XML Manager"
+
+#, fuzzy
+#~| msgid "Marked"
+#~ msgid "marked"
+#~ msgstr "Marked"
+
+#, fuzzy
+#~| msgid "Marked"
+#~ msgid "marked_xml"
+#~ msgstr "Marked"
+
+#~ msgid "score"
+#~ msgstr "pontuação"
 
 #, fuzzy
 #~| msgid "Action"
