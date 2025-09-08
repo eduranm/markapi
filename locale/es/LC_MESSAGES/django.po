@@ -1,0 +1,901 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-04 14:18+0000\n"
+"PO-Revision-Date: 2025-09-03 HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Spanish <es@li.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
+
+#: core/home/templates/home/welcome_page.html:6
+msgid "Visit the Wagtail website"
+msgstr "Visita el sitio web de Wagtail"
+
+#: core/home/templates/home/welcome_page.html:15
+msgid "View the release notes"
+msgstr "Ver las notas de lanzamiento"
+
+#: core/home/templates/home/welcome_page.html:27
+msgid "Welcome to your new Wagtail site!"
+msgstr "¡Bienvenido a tu nuevo sitio Wagtail!"
+
+#: core/home/templates/home/welcome_page.html:28
+msgid ""
+"Please feel free to <a href=\"https://github.com/wagtail/wagtail/wiki/Slack"
+"\">join our community on Slack</a>, or get started with one of the links "
+"below."
+msgstr ""
+"Siéntete libre de <a href=\"https://github.com/wagtail/wagtail/wiki/Slack"
+"\">unirte a nuestra comunidad en Slack</a>, o comenzar con uno de los "
+"enlaces a continuación."
+
+#: core/home/templates/home/welcome_page.html:35
+msgid "Wagtail Documentation"
+msgstr "Documentación de Wagtail"
+
+#: core/home/templates/home/welcome_page.html:36
+msgid "Topics, references, & how-tos"
+msgstr "Temas, referencias y guías prácticas"
+
+#: core/home/templates/home/welcome_page.html:42
+msgid "Tutorial"
+msgstr "Tutorial"
+
+#: core/home/templates/home/welcome_page.html:43
+msgid "Build your first Wagtail site"
+msgstr "Construye tu primer sitio Wagtail"
+
+#: core/home/templates/home/welcome_page.html:49
+msgid "Admin Interface"
+msgstr "Interfaz de Administración"
+
+#: core/home/templates/home/welcome_page.html:50
+msgid "Create your superuser first!"
+msgstr "¡Crea tu superusuario primero!"
+
+#: core/models.py:19 tracker/models.py:76
+msgid "Creation date"
+msgstr "Fecha de creación"
+
+#: core/models.py:22
+msgid "Last update date"
+msgstr "Fecha de última actualización"
+
+#: core/models.py:27
+msgid "Creator"
+msgstr "Creador"
+
+#: core/models.py:37
+msgid "Updater"
+msgstr "Actualizador"
+
+#: core_settings/models.py:18 core_settings/models.py:19
+msgid "Site configuration"
+msgstr "Configuración del sitio"
+
+#: core_settings/models.py:66
+msgid "Site settings"
+msgstr "Configuración del sitio"
+
+#: core_settings/models.py:67
+msgid "Admin settings"
+msgstr "Configuración de administración"
+
+#: django_celery_beat/admin.py:69 django_celery_beat/forms.py:55
+msgid "Task (registered)"
+msgstr "Tarea (registrada)"
+
+#: django_celery_beat/admin.py:73 django_celery_beat/forms.py:59
+msgid "Task (custom)"
+msgstr "Tarea (personalizada)"
+
+#: django_celery_beat/admin.py:90 django_celery_beat/forms.py:75
+msgid "Need name of task"
+msgstr "Se necesita el nombre de la tarea"
+
+#: django_celery_beat/admin.py:96 django_celery_beat/forms.py:81
+#: django_celery_beat/models.py:648
+msgid "Only one can be set, in expires and expire_seconds"
+msgstr "Solo uno puede establecerse, entre expires y expire_seconds"
+
+#: django_celery_beat/admin.py:106 django_celery_beat/forms.py:91
+#, python-format
+msgid "Unable to parse JSON: %s"
+msgstr "No se puede analizar JSON: %s"
+
+#: django_celery_beat/admin.py:207 django_celery_beat/wagtail_hooks.py:70
+#, python-brace-format
+msgid "{0} task{1} {2} successfully {3}"
+msgstr "{0} tarea{1} {2} exitosamente {3}"
+
+#: django_celery_beat/admin.py:210 django_celery_beat/admin.py:283
+#: django_celery_beat/wagtail_hooks.py:73
+#: django_celery_beat/wagtail_hooks.py:154
+msgid "was,were"
+msgstr "fue,fueron"
+
+#: django_celery_beat/admin.py:220 django_celery_beat/wagtail_hooks.py:83
+msgid "Enable selected tasks"
+msgstr "Habilitar tareas seleccionadas"
+
+#: django_celery_beat/admin.py:227 django_celery_beat/wagtail_hooks.py:90
+msgid "Disable selected tasks"
+msgstr "Deshabilitar tareas seleccionadas"
+
+#: django_celery_beat/admin.py:242 django_celery_beat/wagtail_hooks.py:105
+msgid "Toggle activity of selected tasks"
+msgstr "Alternar actividad de las tareas seleccionadas"
+
+#: django_celery_beat/admin.py:266 django_celery_beat/wagtail_hooks.py:130
+#, python-brace-format
+msgid "task \"{0}\" not found"
+msgstr "tarea \"{0}\" no encontrada"
+
+#: django_celery_beat/admin.py:280 django_celery_beat/wagtail_hooks.py:151
+#, python-brace-format
+msgid "{0} task{1} {2} successfully run"
+msgstr "{0} tarea{1} {2} ejecutada{1} exitosamente"
+
+#: django_celery_beat/admin.py:287 django_celery_beat/wagtail_hooks.py:158
+msgid "Run selected tasks"
+msgstr "Ejecutar tareas seleccionadas"
+
+#: django_celery_beat/apps.py:13
+msgid "Periodic Tasks"
+msgstr "Tareas Periódicas"
+
+#: django_celery_beat/button_helper.py:15
+msgid "Run"
+msgstr "Ejecutar"
+
+#: django_celery_beat/choices.py:10
+msgid "Days"
+msgstr "Días"
+
+#: django_celery_beat/choices.py:11
+msgid "Hours"
+msgstr "Horas"
+
+#: django_celery_beat/choices.py:12
+msgid "Minutes"
+msgstr "Minutos"
+
+#: django_celery_beat/choices.py:13
+msgid "Seconds"
+msgstr "Segundos"
+
+#: django_celery_beat/choices.py:14
+msgid "Microseconds"
+msgstr "Microsegundos"
+
+#: django_celery_beat/choices.py:18
+msgid "Day"
+msgstr "Día"
+
+#: django_celery_beat/choices.py:19
+msgid "Hour"
+msgstr "Hora"
+
+#: django_celery_beat/choices.py:20
+msgid "Minute"
+msgstr "Minuto"
+
+#: django_celery_beat/choices.py:21
+msgid "Second"
+msgstr "Segundo"
+
+#: django_celery_beat/choices.py:22
+msgid "Microsecond"
+msgstr "Microsegundo"
+
+#: django_celery_beat/choices.py:26
+msgid "Astronomical dawn"
+msgstr "Amanecer astronómico"
+
+#: django_celery_beat/choices.py:27
+msgid "Civil dawn"
+msgstr "Amanecer civil"
+
+#: django_celery_beat/choices.py:28
+msgid "Nautical dawn"
+msgstr "Amanecer náutico"
+
+#: django_celery_beat/choices.py:29
+msgid "Astronomical dusk"
+msgstr "Anochecer astronómico"
+
+#: django_celery_beat/choices.py:30
+msgid "Civil dusk"
+msgstr "Anochecer civil"
+
+#: django_celery_beat/choices.py:31
+msgid "Nautical dusk"
+msgstr "Anochecer náutico"
+
+#: django_celery_beat/choices.py:32
+msgid "Solar noon"
+msgstr "Mediodía solar"
+
+#: django_celery_beat/choices.py:33
+msgid "Sunrise"
+msgstr "Amanecer"
+
+#: django_celery_beat/choices.py:34
+msgid "Sunset"
+msgstr "Atardecer"
+
+#: django_celery_beat/models.py:70
+msgid "Solar Event"
+msgstr "Evento Solar"
+
+#: django_celery_beat/models.py:71
+msgid "The type of solar event when the job should run"
+msgstr "El tipo de evento solar cuando la tarea debe ejecutarse"
+
+#: django_celery_beat/models.py:76
+msgid "Latitude"
+msgstr "Latitud"
+
+#: django_celery_beat/models.py:77
+msgid "Run the task when the event happens at this latitude"
+msgstr "Ejecutar la tarea cuando el evento ocurra en esta latitud"
+
+#: django_celery_beat/models.py:83
+msgid "Longitude"
+msgstr "Longitud"
+
+#: django_celery_beat/models.py:84
+msgid "Run the task when the event happens at this longitude"
+msgstr "Ejecutar la tarea cuando el evento ocurra en esta longitud"
+
+#: django_celery_beat/models.py:91
+msgid "solar event"
+msgstr "evento solar"
+
+#: django_celery_beat/models.py:92
+msgid "solar events"
+msgstr "eventos solares"
+
+#: django_celery_beat/models.py:132
+msgid "Number of Periods"
+msgstr "Número de Períodos"
+
+#: django_celery_beat/models.py:134
+msgid "Number of interval periods to wait before running the task again"
+msgstr ""
+"Número de períodos de intervalo a esperar antes de ejecutar la tarea "
+"nuevamente"
+
+#: django_celery_beat/models.py:141
+msgid "Interval Period"
+msgstr "Período de Intervalo"
+
+#: django_celery_beat/models.py:142
+msgid "The type of period between task runs (Example: days)"
+msgstr "El tipo de período entre ejecuciones de la tarea (Ejemplo: días)"
+
+#: django_celery_beat/models.py:148
+msgid "interval"
+msgstr "intervalo"
+
+#: django_celery_beat/models.py:149
+msgid "intervals"
+msgstr "intervalos"
+
+#: django_celery_beat/models.py:175
+msgid "every {}"
+msgstr "cada {}"
+
+#: django_celery_beat/models.py:180
+msgid "every {} {}"
+msgstr "cada {} {}"
+
+#: django_celery_beat/models.py:191
+msgid "Clock Time"
+msgstr "Hora del Reloj"
+
+#: django_celery_beat/models.py:192
+msgid "Run the task at clocked time"
+msgstr "Ejecutar la tarea a la hora programada"
+
+#: django_celery_beat/models.py:198 django_celery_beat/models.py:199
+msgid "clocked"
+msgstr "programado"
+
+#: django_celery_beat/models.py:239
+msgid "Minute(s)"
+msgstr "Minuto(s)"
+
+#: django_celery_beat/models.py:240
+msgid "Cron Minutes to Run. Use \"*\" for \"all\". (Example: \"0,30\")"
+msgstr ""
+"Minutos de Cron para Ejecutar. Usa \"*\" para \"todos\". (Ejemplo: \"0,30\")"
+
+#: django_celery_beat/models.py:246
+msgid "Hour(s)"
+msgstr "Hora(s)"
+
+#: django_celery_beat/models.py:247
+msgid "Cron Hours to Run. Use \"*\" for \"all\". (Example: \"8,20\")"
+msgstr ""
+"Horas de Cron para Ejecutar. Usa \"*\" para \"todas\". (Ejemplo: \"8,20\")"
+
+#: django_celery_beat/models.py:253
+msgid "Day(s) Of The Week"
+msgstr "Día(s) de la Semana"
+
+#: django_celery_beat/models.py:255
+msgid "Cron Days Of The Week to Run. Use \"*\" for \"all\". (Example: \"0,5\")"
+msgstr ""
+"Días de la Semana de Cron para Ejecutar. Usa \"*\" para \"todos\". (Ejemplo: "
+"\"0,5\")"
+
+#: django_celery_beat/models.py:262
+msgid "Day(s) Of The Month"
+msgstr "Día(s) del Mes"
+
+#: django_celery_beat/models.py:264
+msgid ""
+"Cron Days Of The Month to Run. Use \"*\" for \"all\". (Example: \"1,15\")"
+msgstr ""
+"Días del Mes de Cron para Ejecutar. Usa \"*\" para \"todos\". (Ejemplo: "
+"\"1,15\")"
+
+#: django_celery_beat/models.py:271
+msgid "Month(s) Of The Year"
+msgstr "Mes(es) del Año"
+
+#: django_celery_beat/models.py:273
+msgid ""
+"Cron Months Of The Year to Run. Use \"*\" for \"all\". (Example: \"0,6\")"
+msgstr ""
+"Meses del Año de Cron para Ejecutar. Usa \"*\" para \"todos\". (Ejemplo: "
+"\"0,6\")"
+
+#: django_celery_beat/models.py:280
+msgid "Cron Timezone"
+msgstr "Zona Horaria de Cron"
+
+#: django_celery_beat/models.py:281
+msgid "Timezone to Run the Cron Schedule on. Default is UTC."
+msgstr "Zona horaria para ejecutar la programación Cron. Por defecto es UTC."
+
+#: django_celery_beat/models.py:287
+msgid "crontab"
+msgstr "crontab"
+
+#: django_celery_beat/models.py:288
+msgid "crontabs"
+msgstr "crontabs"
+
+#: django_celery_beat/models.py:385
+msgid "Name"
+msgstr "Nombre"
+
+#: django_celery_beat/models.py:386
+msgid "Short Description For This Task"
+msgstr "Descripción Corta para esta Tarea"
+
+#: django_celery_beat/models.py:392
+msgid ""
+"The Name of the Celery Task that Should be Run.  (Example: \"proj.tasks."
+"import_contacts\")"
+msgstr ""
+"El Nombre de la Tarea Celery que Debe Ejecutarse. (Ejemplo: \"proj.tasks."
+"import_contacts\")"
+
+#: django_celery_beat/models.py:404
+msgid "Interval Schedule"
+msgstr "Programación por Intervalos"
+
+#: django_celery_beat/models.py:406
+msgid ""
+"Interval Schedule to run the task on.  Set only one schedule type, leave the "
+"others null."
+msgstr ""
+"Programación por Intervalos para ejecutar la tarea. Establece solo un tipo "
+"de programación, deja los otros nulos."
+
+#: django_celery_beat/models.py:415
+msgid "Crontab Schedule"
+msgstr "Programación Crontab"
+
+#: django_celery_beat/models.py:417
+msgid ""
+"Crontab Schedule to run the task on.  Set only one schedule type, leave the "
+"others null."
+msgstr ""
+"Programación Crontab para ejecutar la tarea. Establece solo un tipo de "
+"programación, deja los otros nulos."
+
+#: django_celery_beat/models.py:426
+msgid "Solar Schedule"
+msgstr "Programación Solar"
+
+#: django_celery_beat/models.py:428
+msgid ""
+"Solar Schedule to run the task on.  Set only one schedule type, leave the "
+"others null."
+msgstr ""
+"Programación Solar para ejecutar la tarea. Establece solo un tipo de "
+"programación, deja los otros nulos."
+
+#: django_celery_beat/models.py:437
+msgid "Clocked Schedule"
+msgstr "Programación por Hora"
+
+#: django_celery_beat/models.py:439
+msgid ""
+"Clocked Schedule to run the task on.  Set only one schedule type, leave the "
+"others null."
+msgstr ""
+"Programación por Hora para ejecutar la tarea. Establece solo un tipo de "
+"programación, deja los otros nulos."
+
+#: django_celery_beat/models.py:447
+msgid "Positional Arguments"
+msgstr "Argumentos Posicionales"
+
+#: django_celery_beat/models.py:448
+msgid "JSON encoded positional arguments (Example: [\"arg1\", \"arg2\"])"
+msgstr ""
+"Argumentos posicionales codificados en JSON (Ejemplo: [\"arg1\", \"arg2\"])"
+
+#: django_celery_beat/models.py:453
+msgid "Keyword Arguments"
+msgstr "Argumentos con Palabra Clave"
+
+#: django_celery_beat/models.py:455
+msgid "JSON encoded keyword arguments (Example: {\"argument\": \"value\"})"
+msgstr ""
+"Argumentos con palabra clave codificados en JSON (Ejemplo: {\"argument\": "
+"\"value\"})"
+
+#: django_celery_beat/models.py:464
+msgid "Queue Override"
+msgstr "Anulación de Cola"
+
+#: django_celery_beat/models.py:466
+msgid "Queue defined in CELERY_TASK_QUEUES. Leave None for default queuing."
+msgstr "Cola definida en CELERY_TASK_QUEUES. Deja None para cola por defecto."
+
+#: django_celery_beat/models.py:478
+msgid "Exchange"
+msgstr "Exchange"
+
+#: django_celery_beat/models.py:479
+msgid "Override Exchange for low-level AMQP routing"
+msgstr "Anular Exchange para enrutamiento AMQP de bajo nivel"
+
+#: django_celery_beat/models.py:486
+msgid "Routing Key"
+msgstr "Clave de Enrutamiento"
+
+#: django_celery_beat/models.py:487
+msgid "Override Routing Key for low-level AMQP routing"
+msgstr "Anular Clave de Enrutamiento para enrutamiento AMQP de bajo nivel"
+
+#: django_celery_beat/models.py:492
+msgid "AMQP Message Headers"
+msgstr "Cabeceras de Mensaje AMQP"
+
+#: django_celery_beat/models.py:493
+msgid "JSON encoded message headers for the AMQP message."
+msgstr "Cabeceras de mensaje codificadas en JSON para el mensaje AMQP."
+
+#: django_celery_beat/models.py:501
+msgid "Priority"
+msgstr "Prioridad"
+
+#: django_celery_beat/models.py:503
+msgid ""
+"Priority Number between 0 and 255. Supported by: RabbitMQ, Redis (priority "
+"reversed, 0 is highest)."
+msgstr ""
+"Número de Prioridad entre 0 y 255. Soportado por: RabbitMQ, Redis (prioridad "
+"invertida, 0 es la más alta)."
+
+#: django_celery_beat/models.py:510
+msgid "Expires Datetime"
+msgstr "Fecha y Hora de Expiración"
+
+#: django_celery_beat/models.py:512
+msgid ""
+"Datetime after which the schedule will no longer trigger the task to run"
+msgstr ""
+"Fecha y hora después de la cual la programación ya no activará la ejecución "
+"de la tarea"
+
+#: django_celery_beat/models.py:519
+msgid "Expires timedelta with seconds"
+msgstr "Expira timedelta con segundos"
+
+#: django_celery_beat/models.py:521
+msgid ""
+"Timedelta with seconds which the schedule will no longer trigger the task to "
+"run"
+msgstr ""
+"Timedelta con segundos después del cual la programación ya no activará la "
+"ejecución de la tarea"
+
+#: django_celery_beat/models.py:527
+msgid "One-off Task"
+msgstr "Tarea Única"
+
+#: django_celery_beat/models.py:528
+msgid "If True, the schedule will only run the task a single time"
+msgstr "Si es Verdadero, la programación ejecutará la tarea solo una vez"
+
+#: django_celery_beat/models.py:533
+msgid "Start Datetime"
+msgstr "Fecha y Hora de Inicio"
+
+#: django_celery_beat/models.py:535
+msgid "Datetime when the schedule should begin triggering the task to run"
+msgstr ""
+"Fecha y hora cuando la programación debe comenzar a activar la ejecución de "
+"la tarea"
+
+#: django_celery_beat/models.py:540
+msgid "Enabled"
+msgstr "Habilitado"
+
+#: django_celery_beat/models.py:541
+msgid "Set to False to disable the schedule"
+msgstr "Establecer en Falso para deshabilitar la programación"
+
+#: django_celery_beat/models.py:549
+msgid "Last Run Datetime"
+msgstr "Fecha y Hora de Última Ejecución"
+
+#: django_celery_beat/models.py:551
+msgid ""
+"Datetime that the schedule last triggered the task to run. Reset to None if "
+"enabled is set to False."
+msgstr ""
+"Fecha y hora en que la programación activó por última vez la ejecución de la "
+"tarea. Se restablece a None si habilitado se establece en Falso."
+
+#: django_celery_beat/models.py:558
+msgid "Total Run Count"
+msgstr "Conteo Total de Ejecuciones"
+
+#: django_celery_beat/models.py:560
+msgid "Running count of how many times the schedule has triggered the task"
+msgstr "Conteo continuo de cuántas veces la programación ha activado la tarea"
+
+#: django_celery_beat/models.py:565
+msgid "Last Modified"
+msgstr "Última Modificación"
+
+#: django_celery_beat/models.py:566
+msgid "Datetime that this PeriodicTask was last modified"
+msgstr "Fecha y hora en que esta Tarea Periódica fue modificada por última vez"
+
+#: django_celery_beat/models.py:570
+msgid "Description"
+msgstr "Descripción"
+
+#: django_celery_beat/models.py:571
+msgid "Detailed description about the details of this Periodic Task"
+msgstr "Descripción detallada sobre los detalles de esta Tarea Periódica"
+
+#: django_celery_beat/models.py:576
+msgid "This is the configuration area for executing asynchronous tasks."
+msgstr "Esta es el área de configuración de ejecución de tareas asíncronas."
+
+#: django_celery_beat/models.py:597
+msgid "Content"
+msgstr "Contenido"
+
+#: django_celery_beat/models.py:598
+msgid "Scheduler"
+msgstr "Programador"
+
+#: django_celery_beat/models.py:608
+msgid "periodic task"
+msgstr "tarea periódica"
+
+#: django_celery_beat/models.py:609
+msgid "periodic tasks"
+msgstr "tareas periódicas"
+
+#: django_celery_beat/templates/admin/djcelery/change_list.html:6
+msgid "Home"
+msgstr "Inicio"
+
+#: django_celery_beat/views.py:34
+#, python-brace-format
+msgid "Task {0} was successfully run"
+msgstr "La tarea {0} fue ejecutada exitosamente"
+
+#: django_celery_beat/wagtail_hooks.py:193
+msgid "Tasks"
+msgstr "Tareas"
+
+#: reference/models.py:15
+msgid "Mixed Citation"
+msgstr "Cita mixta"
+
+#: reference/models.py:30
+#, fuzzy
+#| msgid "Reference"
+msgid "Referência"
+msgstr "Referencia"
+
+#: reference/models.py:31
+#, fuzzy
+#| msgid "Reference"
+msgid "Referências"
+msgstr "Referencia"
+
+#: reference/models.py:38
+msgid "Marked"
+msgstr "Marcado"
+
+#: reference/models.py:39
+msgid "Marked XML"
+msgstr "XML Marcado"
+
+#: reference/models.py:48
+msgid "Rating from 1 to 10"
+msgstr "Calificación del 1 al 10"
+
+#: reference/wagtail_hooks.py:45
+msgid "Reference"
+msgstr "Referencia"
+
+#: tracker/choices.py:9
+msgid "error"
+msgstr "error"
+
+#: tracker/choices.py:10
+msgid "warning"
+msgstr "advertencia"
+
+#: tracker/choices.py:11
+msgid "info"
+msgstr "información"
+
+#: tracker/choices.py:12
+msgid "exception"
+msgstr "excepción"
+
+#: tracker/choices.py:24
+msgid "To reprocess"
+msgstr "Para reprocesar"
+
+#: tracker/choices.py:25
+msgid "To do"
+msgstr "Por hacer"
+
+#: tracker/choices.py:26
+msgid "Done"
+msgstr "Completado"
+
+#: tracker/choices.py:27
+msgid "Doing"
+msgstr "Haciendo"
+
+#: tracker/choices.py:28
+msgid "Pending"
+msgstr "Pendiente"
+
+#: tracker/choices.py:29
+msgid "ignored"
+msgstr "ignorado"
+
+#: tracker/choices.py:41
+msgid "XML Parsing Error"
+msgstr "Error de Análisis XML"
+
+#: tracker/choices.py:42
+msgid "XML Validation Error"
+msgstr "Error de Validación XML"
+
+#: tracker/choices.py:43
+msgid "XML Conversion to DOCX Error"
+msgstr "Error de Conversión XML a DOCX"
+
+#: tracker/choices.py:44
+msgid "XML Conversion to HTML Error"
+msgstr "Error de Conversión XML a HTML"
+
+#: tracker/choices.py:45
+msgid "XML Conversion to PDF Error"
+msgstr "Error de Conversión XML a PDF"
+
+#: tracker/choices.py:46
+msgid "XML Conversion to TEX Error"
+msgstr "Error de Conversión XML a TEX"
+
+#: tracker/choices.py:47
+msgid "Unknown Error"
+msgstr "Error Desconocido"
+
+#: tracker/models.py:28
+msgid "Error Type"
+msgstr "Tipo de Error"
+
+#: tracker/models.py:35
+msgid "Data"
+msgstr "Datos"
+
+#: tracker/models.py:39
+msgid "Message"
+msgstr "Mensaje"
+
+#: tracker/models.py:44
+msgid "Handled"
+msgstr "Manejado"
+
+#: tracker/models.py:70
+msgid "XML Document Event"
+msgstr "Evento de Documento XML"
+
+#: tracker/models.py:71 tracker/wagtail_hooks.py:16
+msgid "XML Document Events"
+msgstr "Eventos de Documento XML"
+
+#: tracker/models.py:77
+msgid "Exception Type"
+msgstr "Tipo de Excepción"
+
+#: tracker/models.py:78
+msgid "Exception Msg"
+msgstr "Mensaje de Excepción"
+
+#: tracker/models.py:82
+msgid "Item"
+msgstr "Elemento"
+
+#: tracker/models.py:88 xml_manager/wagtail_hooks.py:69
+msgid "Action"
+msgstr "Acción"
+
+#: tracker/models.py:101
+msgid "General Event"
+msgstr "Evento General"
+
+#: tracker/models.py:102 tracker/wagtail_hooks.py:47
+msgid "General Events"
+msgstr "Eventos Generales"
+
+#: tracker/wagtail_hooks.py:81
+msgid "Unexpected Events"
+msgstr "Eventos Inesperados"
+
+#: users/admin.py:13
+msgid "Personal info"
+msgstr "Información personal"
+
+#: users/admin.py:15
+msgid "Permissions"
+msgstr "Permisos"
+
+#: users/admin.py:26
+msgid "Important dates"
+msgstr "Fechas importantes"
+
+#: users/forms.py:11
+msgid "This username has already been taken."
+msgstr "Este nombre de usuario ya ha sido tomado."
+
+#: users/models.py:15
+msgid "Name of User"
+msgstr "Nombre del Usuario"
+
+#: xml_manager/models.py:9
+msgid "XML File"
+msgstr "Archivo XML"
+
+#: xml_manager/models.py:10
+msgid "Upload an XML file for processing."
+msgstr "Subir un archivo XML para procesamiento."
+
+#: xml_manager/models.py:16
+msgid "Validation File"
+msgstr "Archivo de Validación"
+
+#: xml_manager/models.py:22
+msgid "Exceptions File"
+msgstr "Archivo de Excepciones"
+
+#: xml_manager/models.py:26 xml_manager/models.py:61 xml_manager/models.py:93
+msgid "Uploaded At"
+msgstr "Subido En"
+
+#: xml_manager/models.py:27
+msgid "The date and time when the file was uploaded."
+msgstr "La fecha y hora cuando el archivo fue subido."
+
+#: xml_manager/models.py:38 xml_manager/models.py:43 xml_manager/models.py:82
+#: xml_manager/wagtail_hooks.py:56 xml_manager/wagtail_hooks.py:60
+msgid "XML Document"
+msgstr "Documento XML"
+
+#: xml_manager/models.py:39 xml_manager/wagtail_hooks.py:57
+msgid "XML Documents"
+msgstr "Documentos XML"
+
+#: xml_manager/models.py:46
+msgid "PDF File"
+msgstr "Archivo PDF"
+
+#: xml_manager/models.py:50
+msgid "DOCX File"
+msgstr "Archivo DOCX"
+
+#: xml_manager/models.py:53
+msgid "Intermediate DOCX file generated during PDF creation"
+msgstr "Archivo DOCX intermedio generado durante la creación del PDF"
+
+#: xml_manager/models.py:58 xml_manager/models.py:90
+msgid "Language"
+msgstr "Idioma"
+
+#: xml_manager/models.py:59 xml_manager/models.py:91
+msgid "Language code or name"
+msgstr "Código o nombre del idioma"
+
+#: xml_manager/models.py:67 xml_manager/wagtail_hooks.py:77
+#: xml_manager/wagtail_hooks.py:81
+msgid "XML Document PDF"
+msgstr "PDF de Documento XML"
+
+#: xml_manager/models.py:68 xml_manager/wagtail_hooks.py:78
+msgid "XML Document PDFs"
+msgstr "PDFs de Documento XML"
+
+#: xml_manager/models.py:85
+msgid "HTML File"
+msgstr "Archivo HTML"
+
+#: xml_manager/models.py:99 xml_manager/wagtail_hooks.py:98
+#: xml_manager/wagtail_hooks.py:102
+msgid "XML Document HTML"
+msgstr "HTML de Documento XML"
+
+#: xml_manager/models.py:100 xml_manager/wagtail_hooks.py:99
+msgid "XML Document HTMLs"
+msgstr "HTMLs de Documento XML"
+
+#: xml_manager/wagtail_hooks.py:66
+msgid "Validation file"
+msgstr "Archivo de validación"
+
+#: xml_manager/wagtail_hooks.py:67
+msgid "Exceptions file"
+msgstr "Archivo de excepciones"
+
+#: xml_manager/wagtail_hooks.py:118
+msgid "XML Manager"
+msgstr "Gestor XML"
+
+#, fuzzy
+#~| msgid "Marked"
+#~ msgid "marked"
+#~ msgstr "Marcado"
+
+#, fuzzy
+#~| msgid "Marked"
+#~ msgid "marked_xml"
+#~ msgstr "Marcado"
+
+#~ msgid "score"
+#~ msgstr "puntaje"
+
+#~ msgid "AÃ§Ãµes"
+#~ msgstr "Acciones"

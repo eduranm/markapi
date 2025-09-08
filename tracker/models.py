@@ -98,8 +98,8 @@ class GeneralEvent(models.Model):
             models.Index(fields=["action"]),
         ]
         ordering = ["-created"]
-    verbose_name = _("General Event")
-    verbose_name_plural = _("General Events")
+        verbose_name = _("General Event")
+        verbose_name_plural = _("General Events")
 
     def __str__(self):
         if self.item or self.action:

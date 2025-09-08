@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from wagtail.admin.panels import FieldPanel, ObjectList, TabbedInterface
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail.fields import RichTextField
@@ -15,8 +15,8 @@ class CustomSettings(BaseSiteSetting):
     """
 
     class Meta:
-        verbose_name = _("Configuração do site")
-        verbose_name_plural = _("Configuração do site")
+        verbose_name = _("Site configuration")
+        verbose_name_plural = _("Site configuration")
 
     name = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(max_length=100, null=True, blank=True)
