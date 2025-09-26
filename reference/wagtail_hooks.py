@@ -8,11 +8,21 @@ from wagtail_modeladmin.options import (
 from wagtail_modeladmin.views import CreateView
 from wagtail.admin.menu import MenuItem
 
-from reference.tasks import get_reference
+from reference.data_utils import get_reference
 
 from reference.models import ( 
     Reference
 )
+
+from wagtail.snippets.views.snippets import (
+    CreateView,
+    EditView,
+    SnippetViewSet,
+    SnippetViewSetGroup
+)
+
+from wagtail.snippets.models import register_snippet
+from model_ai.tasks import download_model
 
 class ReferenceCreateView(CreateView):
     def form_valid(self, form):
@@ -37,10 +47,9 @@ class ReferenceCreateView(CreateView):
         return HttpResponseRedirect(self.get_success_url())
         
 
-
-class ReferenceAdmin(ModelAdmin):
+class ReferenceModelViewSet(SnippetViewSet):
     model = Reference
-    create_view_class = ReferenceCreateView
+    add_view_class = ReferenceCreateView
     #edit_view_class = ArticleDocxEditView
     menu_label = _("Reference")
     menu_icon = "folder"
@@ -52,4 +61,4 @@ class ReferenceAdmin(ModelAdmin):
     list_per_page = 20
 
 
-modeladmin_register(ReferenceAdmin)
+register_snippet(ReferenceModelViewSet)
