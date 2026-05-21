@@ -27,6 +27,8 @@ from markup_doc.labeling_utils import (
     process_reference,
     process_references,
     split_in_three,
+    create_special_content_object,
+    comes_before_or_equal
 )
 from markup_doc.models import MarkupXML, ProcessStatus, UploadDocx
 from markup_doc.sync_api import sync_issues_from_api, sync_journals_from_api
@@ -206,6 +208,9 @@ def get_labels(article_id, user_id):
     next_item = None
     obj_reference = []
     llm_first_block = None
+    obj_postreference = []
+    last_obj = None
+    llama_model = False
 
     for i, item in enumerate(content):
         if next_item:
@@ -369,14 +374,11 @@ def get_labels(article_id, user_id):
             stream_data_body.append(obj)
             continue
 
-        if item.get("text") is None or item.get("text") == "":
-            state["label_next"] = (
-                state["label_next_reset"] if state["reset"] else state["label_next"]
-            )
-            if state["back"]:
-                state["back"] = False
-                state["body"] = False
-                state["references"] = True
+        if item.get('text') is None or item.get('text') == '':
+            state['label_next'] = state['label_next_reset'] if state['reset'] else state['label_next']
+            if state['back'] and num_ref > 0:
+                state['body'] = False
+                state['references'] = True
         else:
             obj, result, state = create_labeled_object2(i, item, state, sections)
 
@@ -403,20 +405,23 @@ def get_labels(article_id, user_id):
                             stream_data.append(obj)
                     else:
                         stream_data_body.append(obj)
-                elif state["back"]:
-                    if state["label"] == "<sec>":
+                elif state['back']:
+                    if state['references']:
+                        obj_postreference.append(obj)
+                    elif state['label'] == '<sec>':
                         stream_data_back.append(obj)
-                    if state["label"] == "<p>":
-                        num_ref = num_ref + 1
-                        # obj = {}#process_reference(num_ref, obj, user_id)
-                        obj_reference.append(
-                            {
-                                "num_ref": num_ref,
-                                "obj": obj,
-                                "text": obj["value"]["paragraph"],
-                            }
-                        )
-                    # stream_data_back.append(obj)
+                    elif state['label'] == '<p>':
+                        if last_obj is not None and not re.search(r"^(refer)",last_obj.get('value', {}).get('paragraph', '').strip().lower()):
+                            if comes_before_or_equal(last_obj, obj):
+                                num_ref = num_ref + 1
+                                obj_reference.append({"num_ref": num_ref, "obj": obj, "text": obj['value']['paragraph'],})
+                            else:
+                                obj_postreference.append(obj)
+                                state['references'] = True
+                        else:
+                            num_ref = num_ref + 1
+                            obj_reference.append({"num_ref": num_ref, "obj": obj, "text": obj['value']['paragraph'],})
+                        last_obj = obj
                 else:
                     stream_data.append(obj)
 
@@ -455,6 +460,7 @@ def get_labels(article_id, user_id):
                     output.extend(parsed)  # Agrega a la lista de salida
 
         stream_data_back.extend(process_references(num_refs, output))
+        stream_data_back.extend(obj_postreference)
 
     # data_front is never iterated inside get_xml — rescue any <p> items that the
     # state machine left in stream_data (body paragraphs misclassified as front
