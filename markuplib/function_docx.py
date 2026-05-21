@@ -404,11 +404,12 @@ class functionsDocx:
                     paragraph = element
                     text_paragraph = []
 
+                if not obj_image:
+                    paragraph = element
+                    text_paragraph = []
+
                     # Determina si es parte de una lista
-                    is_numPr = (
-                        paragraph.find(".//w:numPr", namespaces=paragraph.nsmap)
-                        is not None
-                    )
+                    is_numPr = paragraph.find('.//w:numPr', namespaces=paragraph.nsmap) is not None
 
                     # obtiene id y nivel
                     if is_numPr:
@@ -457,13 +458,10 @@ class functionsDocx:
                                 if t_elem is not None and t_elem.text:
                                     text_paragraph.append(t_elem.text)
 
-                        elif (
-                            child.tag
-                            == "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}r"
-                        ):
-                            namespaces = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
-                            sz_element = child.find(".//w:sz", namespaces=child.nsmap)
-                            obj["font_size"] = 0
+                        elif child.tag == '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}r':
+                            namespaces = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
+                            sz_element = child.find('.//w:sz', namespaces=child.nsmap)
+                            obj['font_size'] = 12
 
                             if sz_element is None:
                                 p_pr = paragraph.find(
@@ -607,11 +605,23 @@ class functionsDocx:
                                 first_block = ""
                                 tmp_content = []
                                 abstract_mode = False
+                                abstract_started = False
 
                                 for c in content:
                                     if abstract_mode:
-                                        if c["text"] == "" or c["spacing"] is True:
+                                        if not abstract_started:
+                                            if c['text'] == '' or c['spacing'] is True:
+                                                continue
+                                            else:
+                                                abstract_started = True
+                                                tmp_content.append(c)
+                                                continue
+                                        
+                                        # empezó el abstract: sí encuentra vacío marca fin
+                                        if c['text'] == '' or c['spacing'] is True:
                                             abstract_mode = False
+                                            abstract_started = False
+                                            continue
                                         else:
                                             tmp_content.append(c)
                                             continue
@@ -619,9 +629,11 @@ class functionsDocx:
                                     if "paraph" in c:
                                         tmp_content.append(c)
                                         abstract_mode = False
-                                        if c["paraph"] == "<abstract>":
+                                        abstract_started = False
+                                        if c['paraph'] == '<abstract>':
                                             abstract_mode = True
-                                            continue
+                                            abstract_started = False
+                                            continue                                        
                                     else:
                                         if "text" in c:
                                             first_block = first_block + "\n" + c["text"]
