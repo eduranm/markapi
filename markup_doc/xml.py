@@ -861,15 +861,18 @@ def get_xml(article_docx, data_front, data, data_back, xref_map=None):
                 node_p.append(child)
 
     for i, d in enumerate(data_back):
-        if d["value"]["label"] == "<sec>":
-            node_tit = etree.SubElement(node_reflist, "title")
-            append_fragment(node_tit, d["value"]["paragraph"])
-        if d["value"]["label"] == "<p>":
-            values = d["value"]
-            refid = values.get("refid") or f"B{i + 1}"
-            node_ref = etree.SubElement(node_reflist, "ref", attrib={"id": refid})
-            node_mix = etree.SubElement(node_ref, "mixed-citation")
-            append_fragment(node_mix, values["paragraph"])
+        if d['value']['label'] == '<sec>':
+            node_tit = etree.SubElement(node_reflist, 'title')
+            append_fragment(node_tit, d['value']['paragraph'])
+        if d['value']['label'] == '<p>':
+            if 'refid' not in d['value']:
+                continue
+            values = d['value']
+            node_ref = etree.SubElement(node_reflist, 'ref', attrib={"id": values['refid']})
+            #node_label = etree.SubElement(node_ref, 'label')
+            #append_fragment(node_label, values['refid'].replace('B', ''))
+            node_mix = etree.SubElement(node_ref, 'mixed-citation')
+            append_fragment(node_mix, values['paragraph'])
 
             if values.get("reftype") == "journal":
                 node_elem = etree.SubElement(
