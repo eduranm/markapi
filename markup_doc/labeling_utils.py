@@ -2,6 +2,8 @@
 import html
 import json
 import re
+import requests
+import unicodedata
 
 import requests
 
@@ -748,6 +750,20 @@ def match_subsection(item, sections):
     )
 
 
+def normalize_text(text):
+    text = re.sub(r'<[^>]+>', '', text)  # quita etiquetas
+    text = text.strip().lower()
+    text = unicodedata.normalize('NFD', text)
+    text = ''.join(c for c in text if unicodedata.category(c) != 'Mn')
+    return text
+
+
+def comes_before_or_equal(obj1, obj2):
+    p1 = normalize_text(obj1.get('value', {}).get('paragraph', ''))
+    p2 = normalize_text(obj2.get('value', {}).get('paragraph', ''))
+    return p1 <= p2
+
+
 def create_labeled_object2(i, item, state, sections):
     obj = {}
     result = None
@@ -784,6 +800,23 @@ def create_labeled_object2(i, item, state, sections):
         obj["value"] = {"label": state["label"], "paragraph": item.get("text")}
 
 
+    text = item.get('text', '').strip().lower()
+
+    is_references_title = bool(re.fullmatch(
+        r"(?:referencias|references|referências)\s*[:.]?",
+        text
+    ))
+
+    if state.get('body') and is_references_title:  
+        state['label'] = '<sec>'
+        state['body'] = False
+        state['back'] = True
+        obj['type'] = 'paragraph'
+        obj['value'] = {
+            'label': state['label'],
+            'paragraph': item.get('text')
+        }
+    
     if not result:
         result = {"label": "<p>", "body": state["body"], "back": state["back"]}
         state["label"] = result.get("label")
