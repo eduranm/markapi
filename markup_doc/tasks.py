@@ -28,7 +28,7 @@ from markup_doc.labeling_utils import (
     process_references,
     split_in_three,
     create_special_content_object,
-    comes_before_or_equal
+    split_abstract_inline
 )
 from markup_doc.models import MarkupXML, ProcessStatus, UploadDocx
 from markup_doc.sync_api import sync_issues_from_api, sync_journals_from_api
@@ -219,17 +219,37 @@ def get_labels(article_id, user_id):
 
         obj = {}
         if item.get("type") in [
-            "<abstract>",
-            "<date-accepted>",
-            "<date-received>",
-            "<kwd-group>",
-        ]:
+                                    "<abstract>", 
+                                    "<date-accepted>", 
+                                    "<date-received>",
+                                    "<kwd-group>"
+                                    ]:
             if item.get("type") == "<abstract>":
-                if i + 1 < len(content):
+                inline_abstract = split_abstract_inline(item.get("text"))
+
+                if inline_abstract:
+                    abstract_title, abstract_text = inline_abstract
+
                     obj["type"] = "paragraph"
                     obj["value"] = {
                         "label": "<abstract-title>",
-                        "paragraph": item.get("text"),
+                        "paragraph": abstract_title
+                    }
+                    stream_data.append(obj.copy())
+
+                    obj["type"] = "paragraph_with_language"
+                    obj["value"] = {
+                        "label": "<abstract>",
+                        "paragraph": abstract_text,
+                        "language": langid.classify(abstract_text)[0] or None
+                    }
+                    stream_data.append(obj.copy())
+
+                elif i + 1 < len(content):
+                    obj["type"] = "paragraph"
+                    obj["value"] = {
+                        "label": "<abstract-title>",
+                        "paragraph": item.get("text")
                     }
                     stream_data.append(obj.copy())
 
@@ -377,6 +397,7 @@ def get_labels(article_id, user_id):
         if item.get('text') is None or item.get('text') == '':
             state['label_next'] = state['label_next_reset'] if state['reset'] else state['label_next']
             if state['back'] and num_ref > 0:
+                #state['back'] = False
                 state['body'] = False
                 state['references'] = True
         else:
@@ -406,37 +427,56 @@ def get_labels(article_id, user_id):
                     else:
                         stream_data_body.append(obj)
                 elif state['back']:
-                    if state['references']:
-                        obj_postreference.append(obj)
-                    elif state['label'] == '<sec>':
+                    if state['label'] == '<sec>':
                         stream_data_back.append(obj)
-                    elif state['label'] == '<p>':
-                        if last_obj is not None and not re.search(r"^(refer)",last_obj.get('value', {}).get('paragraph', '').strip().lower()):
-                            if comes_before_or_equal(last_obj, obj):
-                                num_ref = num_ref + 1
-                                obj_reference.append({"num_ref": num_ref, "obj": obj, "text": obj['value']['paragraph'],})
-                            else:
-                                obj_postreference.append(obj)
-                                state['references'] = True
-                        else:
-                            num_ref = num_ref + 1
-                            obj_reference.append({"num_ref": num_ref, "obj": obj, "text": obj['value']['paragraph'],})
-                        last_obj = obj
+                    if state['label'] == '<p>':
+                        num_ref = num_ref + 1
+                        #obj = {}#process_reference(num_ref, obj, user_id)
+                        obj_reference.append({"num_ref": num_ref, "obj": obj, "text": obj['value']['paragraph'],})
+                    #stream_data_back.append(obj)
                 else:
                     stream_data.append(obj)
 
-    num_refs = [item["num_ref"] for item in obj_reference]
-
     if get_llm_model_name() == "LLAMA":
         for obj_ref in obj_reference:
-            obj = process_reference(obj_ref["num_ref"], obj_ref["obj"], user_id)
-            stream_data_back.append(obj)
+            obj = process_reference(obj_ref['num_ref'], obj_ref['obj'], user_id)
+
+            is_reference = obj.get('is_reference', True)
+
+            # Por si el modelo devuelve "false" como string
+            if isinstance(is_reference, str):
+                is_reference = is_reference.lower() == 'true'
+
+            if is_reference:
+                # Opcional: quitar is_reference si no lo necesitas en el StreamField
+                obj.pop('is_reference', None)
+                stream_data_back.append(obj)
+
+            else:
+                full_text = (
+                    obj.get('full_text')
+                    or obj_ref.get('text')
+                    or obj_ref.get('obj', {}).get('text')
+                    or ''
+                )
+
+                obj_no_reference = {
+                    'type': 'paragraph',
+                    'value': {
+                        'label': '<p>',
+                        'paragraph': full_text
+                    }
+                }
+
+                obj_postreference.append(obj_no_reference)
 
     else:
         if llm_first_block is None:
             llm_first_block = LlamaService(mode="prompt", temperature=0.1)
         chunks = split_in_three(obj_reference)
-        output = []
+
+        output_reference = []
+        num_refs_reference = []
         logger.info(
             "get_labels: processando %d referências com Gemini (%d chunks)",
             len(obj_reference),
@@ -445,21 +485,53 @@ def get_labels(article_id, user_id):
 
         for chunk in chunks:
             if len(chunk) > 0:
-                text_references = (
-                    "\n".join([item["text"] for item in chunk])
-                    .replace("<italic>", "")
-                    .replace("</italic>", "")
-                )
+                text_references = "\n".join(
+                    [item["text"] for item in chunk]
+                ).replace('<italic>', '').replace('</italic>', '')
+
                 prompt_reference = create_prompt_reference(text_references)
 
                 result = llm_first_block.run(prompt_reference)
 
-                match = re.search(r"\[.*\]", result, re.DOTALL)
+                match = re.search(r'\[.*\]', result, re.DOTALL)
+
                 if match:
                     parsed = json.loads(match.group(0))
-                    output.extend(parsed)  # Agrega a la lista de salida
 
-        stream_data_back.extend(process_references(num_refs, output))
+                    for index, item_response in enumerate(parsed):
+                        if index >= len(chunk):
+                            continue
+
+                        original_item = chunk[index]
+
+                        is_reference = item_response.get('is_reference', True)
+
+                        # Por si el modelo regresa "false" como texto
+                        if isinstance(is_reference, str):
+                            is_reference = is_reference.lower() == 'true'
+
+                        if is_reference:
+                            num_refs_reference.append(original_item["num_ref"])
+                            output_reference.append(item_response)
+
+                        else:
+                            full_text = (
+                                item_response.get('full_text')
+                                or original_item.get('text')
+                                or ''
+                            )
+
+                            obj_no_reference = {
+                                'type': 'paragraph',
+                                'value': {
+                                    'label': '<p>',
+                                    'paragraph': full_text
+                                }
+                            }
+
+                            obj_postreference.append(obj_no_reference)
+
+        stream_data_back.extend(process_references(num_refs_reference, output_reference))
         stream_data_back.extend(obj_postreference)
 
     # data_front is never iterated inside get_xml — rescue any <p> items that the
