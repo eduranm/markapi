@@ -175,6 +175,29 @@ class functionsDocx:
                 return "<date-received>"
             return False
 
+        def is_intro_heading(text):
+            if not text:
+                return False
+
+            text = clean_labels(text)
+            text = re.sub(r'<\/?italic>', '', text, flags=re.I)
+            text = text.strip().lower()
+
+            # Quita numeración tipo:
+            # 1. Introducción
+            # 1 Introducción
+            # 1.1 Introduction
+            text = re.sub(r'^\s*\d+(?:\.\d+)*\.?\s+', '', text)
+
+            # Quita dos puntos o punto final
+            text = re.sub(r'[:.]$', '', text).strip()
+
+            return text in [
+                'introducción',
+                'introduction',
+                'introdução'
+            ]
+
         def matches_section(a, b):
             try:
                 return (
@@ -191,22 +214,22 @@ class functionsDocx:
 
         def identify_section(sections, size, bold, text):
             if size == 0:
-                return sections
+                return sections, None
 
             isupper = text.isupper()
-            s_id = {"size": size, "bold": bold, "isupper": isupper, "count": 0}
+            s_id = {"size": size, "bold": bold, "isupper": isupper, "count": 1}
 
             if len(sections) == 0:
                 sections.append(s_id)
-                return sections
+                return sections, s_id
 
             for section in sections:
                 if matches_section(s_id, section):
-                    section["count"] += 1
-                    return sections
+                    section['count'] += 1
+                    return sections, section
 
             sections.append(s_id)
-            return sections
+            return sections, s_id
 
         def clean_labels(text):
             # Eliminar etiquetas cuadradas tipo [ ... ] con espacios opcionales
@@ -327,6 +350,7 @@ class functionsDocx:
         images = []
         found_fb = False
         review_fb = True
+        intro_section = None
         # Palabras a buscar como indicador del primer bloque
         start_text = ["introducción", "introduction", "introdução"]
 
@@ -337,13 +361,9 @@ class functionsDocx:
 
         for element in doc.element.body:
             is_numPr = False
-            if isinstance(element, CT_P):
-                obj = {}
-                paragraph = element
-                text_paragraph = []
-                _ns_w = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
-                is_numPr = paragraph.find('.//w:numPr', namespaces=_ns_w) is not None
+            obj = {}
 
+            if isinstance(element, CT_P):
                 namespaces = {
                     "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                     "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
@@ -375,15 +395,28 @@ class functionsDocx:
                             if image_name not in images:
                                 images.append(image_name)
 
-                                # Guardar la imagen en Wagtail
                                 wagtail_image = ImageModel.objects.create(
                                     title=image_name,
                                     file=ContentFile(image_data, name=image_name),
                                 )
 
-                                # Referenciar la imagen guardada en el objeto
                                 obj["type"] = "image"
                                 obj["image"] = wagtail_image.id
+
+                # Si el párrafo contiene imagen, no debe depender de is_numPr
+                if obj_image:
+                    if len(current_list) > 0:
+                        current_list.append("[/list]")
+                        objl = {}
+                        objl["type"] = "list"
+                        objl["list"] = "\n".join(current_list)
+                        current_list = []
+                        content.append(objl)
+
+                    if obj.get("type") == "image":
+                        content.append(obj)
+
+                    continue
 
                 ns_math = {
                     "m": "http://schemas.openxmlformats.org/officeDocument/2006/math",
@@ -400,46 +433,35 @@ class functionsDocx:
                         mathml_root, pretty_print=True, encoding="unicode"
                     )
 
-                if not obj_image:
-                    paragraph = element
-                    text_paragraph = []
+                # Si el párrafo contiene fórmula de bloque, tampoco debe depender de is_numPr
+                if obj_formula:
+                    if len(current_list) > 0:
+                        current_list.append("[/list]")
+                        objl = {}
+                        objl["type"] = "list"
+                        objl["list"] = "\n".join(current_list)
+                        current_list = []
+                        content.append(objl)
 
-                if not obj_image:
-                    paragraph = element
-                    text_paragraph = []
+                    content.append(obj)
+                    continue
 
-                    # Determina si es parte de una lista
-                    is_numPr = paragraph.find('.//w:numPr', namespaces=paragraph.nsmap) is not None
+                paragraph = element
+                text_paragraph = []
 
-                    # obtiene id y nivel
-                    if is_numPr:
-                        numPr = paragraph.find(".//w:numPr", namespaces=paragraph.nsmap)
-                        numId = numPr.find(
-                            ".//w:numId", namespaces=paragraph.nsmap
-                        ).get(namespaces_p + "val")
-                        type = [
-                            (key, objt)
-                            for key, objt in list_types.items()
-                            if objt["numId"] == numId
-                        ]
+                # Determina si es parte de una lista
+                is_numPr = paragraph.find(".//w:numPr", namespaces=paragraph.nsmap) is not None
 
-                        # Es una lista diferente
-                        if numId != current_num_id:
-                            current_num_id = numId
-                            if len(current_list) > 0:
-                                current_list.append("[/list]")
-                                objl = {}
-                                objl["type"] = "list"
-                                objl["list"] = "\n".join(current_list)
-                                current_list = []
-                                content.append(objl)
-                            list_type = "bullet"
-                            if type[0][1][str(0)] == "decimal":
-                                list_type = "order"
+                # obtiene id y nivel
+                if is_numPr:
+                    numPr = paragraph.find(".//w:numPr", namespaces=paragraph.nsmap)
+                    numId = numPr.find(".//w:numId", namespaces=paragraph.nsmap).get(namespaces_p + "val")
+                    type_matches = [(key, objt) for key, objt in list_types.items() if objt["numId"] == numId]
 
-                            current_list.append(f'[list list-type="{list_type}"]')
-                    else:
-                        # Se terminaron de agregar elementos a la lista
+                    # Es una lista diferente
+                    if numId != current_num_id:
+                        current_num_id = numId
+
                         if len(current_list) > 0:
                             current_list.append("[/list]")
                             objl = {}
@@ -448,263 +470,278 @@ class functionsDocx:
                             current_list = []
                             content.append(objl)
 
-                    for child in paragraph:
-                        if (
-                            child.tag
-                            == "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}hyperlink"
-                        ):
-                            for r in child.findall("w:r", namespaces=child.nsmap):
-                                t_elem = r.find("w:t", namespaces=child.nsmap)
-                                if t_elem is not None and t_elem.text:
-                                    text_paragraph.append(t_elem.text)
+                        list_type = "bullet"
 
-                        elif child.tag == '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}r':
-                            namespaces = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
-                            sz_element = child.find('.//w:sz', namespaces=child.nsmap)
-                            obj['font_size'] = 12
+                        if type_matches[0][1][str(0)] == "decimal":
+                            list_type = "order"
 
-                            if sz_element is None:
-                                p_pr = paragraph.find(
-                                    ".//w:rPr/w:sz", namespaces=child.nsmap
-                                )
-                                if p_pr is not None:
-                                    sz_element = p_pr.find(
-                                        ".//w:pPr", namespaces=child.nsmap
-                                    )
+                        current_list.append(f'[list list-type="{list_type}"]')
 
-                            if sz_element is not None:
-                                xml_string = etree.tostring(
-                                    sz_element, pretty_print=True, encoding="unicode"
-                                )
-                                size_element = objectify.fromstring(xml_string)
-                                font_size_value = size_element.get(namespaces + "val")
-                                obj["font_size"] = int(font_size_value) / 2
+                else:
+                    # Se terminaron de agregar elementos a la lista
+                    if len(current_list) > 0:
+                        current_list.append("[/list]")
+                        objl = {}
+                        objl["type"] = "list"
+                        objl["list"] = "\n".join(current_list)
+                        current_list = []
+                        content.append(objl)
 
-                            color_element = child.find(
-                                ".//w:color", namespaces=child.nsmap
+                for child in paragraph:
+                    if child.tag == "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}hyperlink":
+                        for r in child.findall("w:r", namespaces=child.nsmap):
+                            t_elem = r.find("w:t", namespaces=child.nsmap)
+
+                            if t_elem is not None and t_elem.text:
+                                text_paragraph.append(t_elem.text)
+
+                    elif child.tag == "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}r":
+                        namespaces = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+                        sz_element = child.find(".//w:sz", namespaces=child.nsmap)
+                        obj["font_size"] = 12
+
+                        if sz_element is None:
+                            p_pr = paragraph.find(".//w:rPr/w:sz", namespaces=child.nsmap)
+
+                            if p_pr is not None:
+                                sz_element = p_pr.find(".//w:pPr", namespaces=child.nsmap)
+
+                        if sz_element is not None:
+                            xml_string = etree.tostring(sz_element, pretty_print=True, encoding="unicode")
+                            size_element = objectify.fromstring(xml_string)
+                            font_size_value = size_element.get(namespaces + "val")
+                            obj["font_size"] = int(font_size_value) / 2
+
+                        color_element = child.find(".//w:color", namespaces=child.nsmap)
+
+                        if color_element is None:
+                            p_pr = paragraph.find(".//w:pPr", namespaces=child.nsmap)
+
+                            if p_pr is not None:
+                                color_element = p_pr.find(".//w:rPr/w:color", namespaces=child.nsmap)
+
+                        if color_element is not None:
+                            xml_string_color = etree.tostring(color_element, pretty_print=True, encoding="unicode")
+                            object_element = objectify.fromstring(xml_string_color)
+                            color_value = object_element.get(namespaces + "val")
+                            obj["color"] = color_value
+
+                        b_tag = child.find(".//w:b", namespaces=child.nsmap)
+
+                        if b_tag is None:
+                            p_pr = paragraph.find(".//w:rPr/w:b", namespaces=child.nsmap)
+
+                            if p_pr is not None:
+                                b_tag = p_pr.find(".//w:pPr", namespaces=child.nsmap)
+
+                        if b_tag is not None:
+                            val = b_tag.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val')
+                            obj["bold"] = (val is None or val in ["1", "true", "True"])
+                        else:
+                            obj["bold"] = False
+
+                        i_tag = child.find(".//w:i", namespaces=child.nsmap)
+
+                        if i_tag is None:
+                            p_pr = paragraph.find(".//w:rPr/w:i", namespaces=child.nsmap)
+
+                            if p_pr is not None:
+                                i_tag = p_pr.find(".//w:pPr", namespaces=child.nsmap)
+
+                        if i_tag is not None:
+                            val = i_tag.get("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val")
+                            obj["italic"] = (val is None or val in ["1", "true", "True"])
+                        else:
+                            obj["italic"] = False
+
+                        s_tag = child.find(".//w:spacing", namespaces=child.nsmap)
+
+                        if s_tag is None:
+                            p_pr = paragraph.find(".//w:rPr/w:spacing", namespaces=child.nsmap)
+
+                            if p_pr is not None:
+                                s_tag = p_pr.find(".//w:pPr", namespaces=child.nsmap)
+
+                        if s_tag is not None:
+                            val = s_tag.get("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}before")
+                            obj["spacing"] = not (val is None)
+                        else:
+                            obj["spacing"] = False
+
+                        clean_text = clean_labels(child.text or "")
+
+                        # Identifica sección
+                        sections, current_section = identify_section(
+                            sections,
+                            obj["font_size"],
+                            obj["bold"],
+                            clean_text
+                        )
+
+                        if intro_section is None and current_section is not None and is_intro_heading(clean_text):
+                            intro_section = current_section.copy()
+
+                        if obj["italic"]:
+                            text_paragraph.append(
+                                "<italic>" + clean_text + "</italic>" + (f" {hiperlinks}" if hiperlinks else "")
+                            )
+                        else:
+                            text_paragraph.append(
+                                clean_text + (f" {hiperlinks}" if hiperlinks else "")
                             )
 
-                            if color_element is None:
-                                p_pr = paragraph.find(
-                                    ".//w:pPr", namespaces=child.nsmap
-                                )
-                                if p_pr is not None:
-                                    color_element = p_pr.find(
-                                        ".//w:rPr/w:color", namespaces=child.nsmap
-                                    )
+                        paraph = match_paragraph(clean_text)
 
-                            if color_element is not None:
-                                xml_string_color = etree.tostring(
-                                    color_element, pretty_print=True, encoding="unicode"
-                                )
-                                object_element = objectify.fromstring(xml_string_color)
-                                color_value = object_element.get(namespaces + "val")
-                                obj["color"] = color_value
-
-                            b_tag = child.find(".//w:b", namespaces=child.nsmap)
-
-                            if b_tag is None:
-                                p_pr = paragraph.find(
-                                    ".//w:rPr/w:b", namespaces=child.nsmap
-                                )
-                                if p_pr is not None:
-                                    b_tag = p_pr.find(
-                                        ".//w:pPr", namespaces=child.nsmap
-                                    )
-
-                            if b_tag is not None:
-                                val = b_tag.get(
-                                    "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val"
-                                )
-                                obj["bold"] = val is None or val in [
-                                    "1",
-                                    "true",
-                                    "True",
-                                ]
-                            else:
-                                obj["bold"] = False
-
-                            i_tag = child.find(".//w:i", namespaces=child.nsmap)
-
-                            if i_tag is None:
-                                p_pr = paragraph.find(
-                                    ".//w:rPr/w:i", namespaces=child.nsmap
-                                )
-                                if p_pr is not None:
-                                    i_tag = p_pr.find(
-                                        ".//w:pPr", namespaces=child.nsmap
-                                    )
-
-                            if i_tag is not None:
-                                val = i_tag.get(
-                                    "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val"
-                                )
-                                obj["italic"] = val is None or val in [
-                                    "1",
-                                    "true",
-                                    "True",
-                                ]
-                            else:
-                                obj["italic"] = False
-
-                            s_tag = child.find(".//w:spacing", namespaces=child.nsmap)
-
-                            if s_tag is None:
-                                p_pr = paragraph.find(
-                                    ".//w:rPr/w:spacing", namespaces=child.nsmap
-                                )
-                                if p_pr is not None:
-                                    s_tag = p_pr.find(
-                                        ".//w:pPr", namespaces=child.nsmap
-                                    )
-
-                            if s_tag is not None:
-                                val = s_tag.get(
-                                    "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}before"
-                                )
-                                obj["spacing"] = not (val is None)
-                            else:
-                                obj["spacing"] = False
-
-                            clean_text = clean_labels(child.text)
-
-                            # identifica sección
-                            sections = identify_section(
-                                sections, obj["font_size"], obj["bold"], clean_text
-                            )
-
-                            if obj["italic"]:
-                                text_paragraph.append(
-                                    "<italic>"
-                                    + clean_text
-                                    + "</italic>"
-                                    + (f" {hiperlinks}" if hiperlinks else "")
-                                )
-                            else:
-                                text_paragraph.append(
-                                    clean_text
-                                    + (f" {hiperlinks}" if hiperlinks else "")
-                                )
-
-                            paraph = match_paragraph(clean_text)
-                            if paraph:
-                                obj["paraph"] = paraph
-                                obj["type"] = paraph
-
-                            if review_fb:
-                                found_fb = any(
-                                    word in clean_text.lower() for word in start_text
-                                )
-
-                            # Si se encontró alguna palabra, incluye todo lo anterior en un sólo bloque
-                            if found_fb:
-                                found_fb = False
-                                review_fb = False
-                                found_hiperlinks = False
-                                sections = [sections[-1]]
-                                first_block = ""
-                                tmp_content = []
-                                abstract_mode = False
-                                abstract_started = False
-
-                                for c in content:
-                                    if abstract_mode:
-                                        if not abstract_started:
-                                            if c['text'] == '' or c['spacing'] is True:
-                                                continue
-                                            else:
-                                                abstract_started = True
-                                                tmp_content.append(c)
-                                                continue
-                                        
-                                        # empezó el abstract: sí encuentra vacío marca fin
-                                        if c['text'] == '' or c['spacing'] is True:
-                                            abstract_mode = False
-                                            abstract_started = False
-                                            continue
-                                        else:
-                                            tmp_content.append(c)
-                                            continue
-
-                                    if "paraph" in c:
-                                        tmp_content.append(c)
-                                        abstract_mode = False
-                                        abstract_started = False
-                                        if c['paraph'] == '<abstract>':
-                                            abstract_mode = True
-                                            abstract_started = False
-                                            continue                                        
-                                    else:
-                                        if "text" in c:
-                                            first_block = first_block + "\n" + c["text"]
-                                        if "table" in c:
-                                            first_block = (
-                                                first_block + "\n" + c["table"]
-                                            )
-
-                                obj_b = {}
-                                obj_b["type"] = "first_block"
-                                obj_b["text"] = first_block
-                                tmp_content.append(obj_b)
-                                content = tmp_content
-                                start_text = []
-
-                        if child.tag == f"{{{ns_math['m']}}}oMath":
-                            if "text" not in obj or not isinstance(obj["text"], list):
-                                obj["type"] = "compound"
-                                obj["text"] = []
-                            if len(text_paragraph) > 0:
-                                obj2 = {}
-                                obj2["type"] = "text"
-                                obj2["value"] = " ".join(text_paragraph)
-                                obj["text"].append(obj2)
-                                text_paragraph = []
-
-                            mathml_result = transform(child)
-                            mathml_root = etree.fromstring(str(mathml_result))
-                            self.replace_mfenced_pipe_only(mathml_root)
-                            obj2 = {}
-                            obj2["type"] = "formula"
-                            obj2["value"] = etree.tostring(
-                                mathml_root, pretty_print=True, encoding="unicode"
-                            )
-                            obj["text"].append(obj2)
-
-                    if "text" not in obj:
-                        obj["text"] = (" ".join(text_paragraph)).strip()
-                        clean_text = clean_labels(obj["text"])
-                        obj["text"] = clean_text
-
-                        paraph = match_paragraph(obj["text"])
                         if paraph:
                             obj["paraph"] = paraph
                             obj["type"] = paraph
 
-                        if is_numPr:
-                            if "font_size" in obj:
-                                del obj["font_size"]
-                            current_list.append(f'[list-item]{obj["text"]}[/list-item]')
-                    if isinstance(obj["text"], list) and len(text_paragraph) > 0:
+                        if review_fb:
+                            found_fb = any(word in clean_text.lower() for word in start_text)
+
+                        # Si se encontró alguna palabra, incluye todo lo anterior en un solo bloque
+                        if found_fb:
+                            found_fb = False
+                            review_fb = False
+                            found_hiperlinks = False
+
+                            first_block = ""
+                            tmp_content = []
+                            abstract_mode = False
+                            abstract_started = False
+
+                            for c in content:
+                                if abstract_mode:
+                                    if not abstract_started:
+                                        if c.get("text") == "" or c.get("spacing") is True:
+                                            continue
+                                        else:
+                                            abstract_started = True
+                                            tmp_content.append(c)
+                                            continue
+
+                                    # Ya empezó el abstract: aquí sí un vacío marca fin
+                                    if c.get("text") == "" or c.get("spacing") is True:
+                                        abstract_mode = False
+                                        abstract_started = False
+                                        continue
+                                    else:
+                                        tmp_content.append(c)
+                                        continue
+
+                                if "paraph" in c:
+                                    tmp_content.append(c)
+                                    abstract_mode = False
+                                    abstract_started = False
+
+                                    if c["paraph"] == "<abstract>":
+                                        abstract_mode = True
+                                        abstract_started = False
+                                        continue
+
+                                else:
+                                    if "text" in c:
+                                        first_block = first_block + "\n" + c["text"]
+
+                                    if "table" in c:
+                                        first_block = first_block + "\n" + c["table"]
+
+                            obj_b = {}
+                            obj_b["type"] = "first_block"
+                            obj_b["text"] = first_block
+                            tmp_content.append(obj_b)
+                            content = tmp_content
+                            start_text = []
+
+                    if child.tag == f"{{{ns_math['m']}}}oMath":
+                        if "text" not in obj or not isinstance(obj["text"], list):
+                            obj["type"] = "compound"
+                            obj["text"] = []
+
+                        if len(text_paragraph) > 0:
+                            obj2 = {}
+                            obj2["type"] = "text"
+                            obj2["value"] = " ".join(text_paragraph)
+                            obj["text"].append(obj2)
+                            text_paragraph = []
+
+                        mathml_result = transform(child)
+                        mathml_root = etree.fromstring(str(mathml_result))
+                        self.replace_mfenced_pipe_only(mathml_root)
+
                         obj2 = {}
-                        obj2["type"] = "text"
-                        obj2["value"] = " ".join(text_paragraph)
+                        obj2["type"] = "formula"
+                        obj2["value"] = etree.tostring(mathml_root, pretty_print=True, encoding="unicode")
                         obj["text"].append(obj2)
-                        text_paragraph = []
+
+                if "text" not in obj:
+                    obj["text"] = (" ".join(text_paragraph)).strip()
+                    clean_text = clean_labels(obj["text"])
+                    obj["text"] = clean_text
+
+                    paraph = match_paragraph(obj["text"])
+
+                    if paraph:
+                        obj["paraph"] = paraph
+                        obj["type"] = paraph
+
+                    if is_numPr:
+                        if "font_size" in obj:
+                            del obj["font_size"]
+
+                        current_list.append(f'[list-item]{obj["text"]}[/list-item]')
+
+                if isinstance(obj.get("text"), list) and len(text_paragraph) > 0:
+                    obj2 = {}
+                    obj2["type"] = "text"
+                    obj2["value"] = " ".join(text_paragraph)
+                    obj["text"].append(obj2)
+                    text_paragraph = []
+
+                # Solo los párrafos que NO son lista se agregan directamente
+                if not is_numPr:
+                    content.append(obj)
 
             elif isinstance(element, CT_Tbl):
+                # Si una tabla viene después de una lista, primero se cierra la lista
+                if len(current_list) > 0:
+                    current_list.append("[/list]")
+                    objl = {}
+                    objl["type"] = "list"
+                    objl["list"] = "\n".join(current_list)
+                    current_list = []
+                    content.append(objl)
+
                 namespaces = {
                     "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                     "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
                     "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
                 }
 
-                table = element
                 table_data = extrae_Tabla(element, hiperlinks_info, namespaces)
+
                 obj = {}
                 obj["type"] = "table"
                 obj["table"] = table_data
 
-            if not is_numPr:
+                # Las tablas no dependen de is_numPr
                 content.append(obj)
+
+        # Si el documento termina con una lista, se cierra aquí
+        if len(current_list) > 0:
+            current_list.append("[/list]")
+            objl = {}
+            objl["type"] = "list"
+            objl["list"] = "\n".join(current_list)
+            current_list = []
+            content.append(objl)
+
         sections.sort(key=section_priority)
+
+        if intro_section is not None:
+            for index, section in enumerate(sections):
+                if matches_section(section, intro_section):
+                    sections = sections[index:]
+                    break
+
         return sections, content
