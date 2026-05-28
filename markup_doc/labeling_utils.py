@@ -739,6 +739,8 @@ def match_section(item, sections):
 
 
 def match_subsection(item, sections):
+    if len(sections) <=2:
+        return None
     return (
         {"label": "<sub-sec>", "body": True}
         if (
@@ -764,59 +766,67 @@ def comes_before_or_equal(obj1, obj2):
     return p1 <= p2
 
 
+def is_probable_heading(text, max_chars=100, max_words=5):
+    if not text:
+        return False
+
+    words = text.split()
+
+    # Si es muy largo, probablemente es párrafo
+    if len(text) > max_chars:
+        return False
+
+    if len(words) > max_words:
+        return False
+
+    return True
+
+
 def create_labeled_object2(i, item, state, sections):
     obj = {}
     result = None
 
-    if match_section(item, sections):
-        result = match_section(item, sections)
-        state["label"] = result.get("label")
-        state["body"] = result.get("body")
-
-    if match_subsection(item, sections):
-        result = match_subsection(item, sections)
-        state["label"] = result.get("label")
-        state["body"] = result.get("body")
-
-    if (
-        state.get("body")
-        and re.search(r"^(refer)", item.get("text").lower())
-        and match_section(item, sections)
-    ):
-        state["label"] = "<sec>"
-        state["body"] = False
-        state["back"] = True
-        obj["type"] = "paragraph"
-        obj["value"] = {"label": state["label"], "paragraph": item.get("text")}
-
-    if state.get("body") and re.search(
-        r"^(refer[eê]nci|references?)\s*$", item.get("text").strip().lower()
-    ):
-        state["label"] = "<sec>"
-        state["body"] = False
-        state["back"] = True
-        result = {"label": "<sec>", "body": False, "back": True}
-        obj["type"] = "paragraph"
-        obj["value"] = {"label": state["label"], "paragraph": item.get("text")}
-
-
-    text = item.get('text', '').strip().lower()
+    raw_text = item.get('text', '').strip()
+    text = raw_text.lower()
 
     is_references_title = bool(re.fullmatch(
         r"(?:referencias|references|referências)\s*[:.]?",
         text
     ))
 
-    if state.get('body') and is_references_title:  
+    is_heading_candidate = is_probable_heading(raw_text)
+
+    # Si es título de referencias, debe poder pasar aunque falle otra regla
+    if is_references_title:
+        is_heading_candidate = True
+
+    if is_heading_candidate:
+        section_result = match_section(item, sections)
+
+        if section_result:
+            result = section_result
+            state['label'] = result.get('label')
+            state['body'] = result.get('body')
+
+        else:
+            subsection_result = match_subsection(item, sections)
+
+            if subsection_result:
+                result = subsection_result
+                state['label'] = result.get('label')
+                state['body'] = result.get('body')
+
+    if state.get('body') and is_references_title:
         state['label'] = '<sec>'
         state['body'] = False
         state['back'] = True
+
         obj['type'] = 'paragraph'
         obj['value'] = {
             'label': state['label'],
             'paragraph': item.get('text')
         }
-    
+
     if not result:
         result = {"label": "<p>", "body": state["body"], "back": state["back"]}
         state["label"] = result.get("label")
@@ -1324,6 +1334,7 @@ def append_fragment(node_dest, val):
     #    - quitar saltos de línea
     clean = re.sub(r"(?i)<br\s*/?>", "", val)
     clean = clean.replace("\n", "")
+    clean = re.sub(r'<(?![/a-zA-Z_])', '&lt;', clean)
 
     # normaliza entidades problemáticas
     clean = clean.replace("&nbsp;", " ")
@@ -1418,3 +1429,22 @@ def proccess_special_content(text, data_body):
         )
 
     return res
+
+
+def split_abstract_inline(text):
+    if not text:
+        return None
+
+    pattern = r'(?is)^\s*(?:<italic>)?\s*(abstract|resumen|resumo)\s*(?:</italic>)?\s*[:.]\s*(.+)$'
+    match = re.match(pattern, text)
+
+    if not match:
+        return None
+
+    abstract_title = match.group(1).strip()
+    abstract_text = match.group(2).strip()
+
+    if not abstract_text:
+        return None
+
+    return abstract_title, abstract_text
