@@ -4,6 +4,9 @@ def create_prompt_reference(references):
     You are an assistant who distinguishes all the components of all citations in an article with output in JSON
 
     Rules:
+    - First determine whether the paragraph is a bibliographic reference.
+    - If the paragraph is not a bibliographic reference, do not analyze its metadata. Return only full_text and is_reference with value false.
+    - If the paragraph is a bibliographic reference, set is_reference to true and extract the metadata.
     - If a DOI is present in the citation, it must be included in the doi field, and the uri field must be None. If there is no DOI, then a valid persistent URL (e.g., from a repository or publisher) must be provided in the uri field instead. One of these fields — doi or uri — must always be populated. Never leave both empty.
     - For references of type journal, the field pages must not be included, even if they appear in the original citation. Instead, the page range should be provided only in the fields fpage and lpage.
     - Consider that in book-type references, the source field generally refers to the title of the book, so do not use the title field in this case, only source.
@@ -16,6 +19,7 @@ def create_prompt_reference(references):
             "type": "object",
             "properties": {{
                 "full_text": {{"type": "string"}},
+                "is_reference": {{"type": "boolean"}},
                 "reftype": {{"type": "string", "enum": ["journal", "thesis", "book", "data", "webpage", "software", "confproc"]}},
                 "authors": {{"type": "array",
                             "items": {{
@@ -81,11 +85,16 @@ def create_prompt_reference(references):
 
     Furton EJ, Dort V, editors. Addiction and compulsive behaviors. Proceedings of the 17th Workshop for Bishops; 1999; Dallas, TX. Boston: National Catholic Bioethics Center (US); 2000. 258 p.
     
+    Figures Captions
+
+    Author's Address.
+
     Response:
 
     [
     {{
                         "full_text": "Bachman, S., J. Moat, A. W. Hill, J. de la Torre and B. Scott. 2011. Supporting Red List threat assessments with GeoCAT: geospatial conservation assessment tool. ZooKeys 150: 117-126. DOI: https://doi.org/10.3897/zookeys.150.2109",
+                        "is_reference": true,
                         "reftype": "journal",
                         "authors":  [
                             {{   "surname": "Bachman", "fname": "S." }},
@@ -105,6 +114,7 @@ def create_prompt_reference(references):
                 }},
     {{
                         "full_text": "Brunel, J. F. 1987. Sur le genre Phyllanthus L. et quelques genres voisins de la Tribu des Phyllantheae Dumort. (Euphorbiaceae, Phyllantheae) en Afrique intertropicale et à Madagascar. Thèse de doctorat de l’Université L. Pasteur. Strasbourg, France. 760 pp.",
+                        "is_reference": true,
                         "reftype": "Thesis",
                         "authors":  [
                             {{   "surname": "Brunel", "fname": "J. F." }},
@@ -118,6 +128,7 @@ def create_prompt_reference(references):
                 }},
     {{
                         "full_text": "Hernández-López, L. 1995. The endemic flora of Jalisco, Mexico: Centers of endemism and implications for conservation. Tesis de maestría. Universidad de Wisconsin. Madison, USA. 74 pp.",
+                        "is_reference": true,
                         "reftype": "Thesis",
                         "authors":  [
                             {{   "surname": "Hernández-López", "fname": "L." }},
@@ -131,6 +142,7 @@ def create_prompt_reference(references):
                 }},
     {{
                         "full_text": "Jones DL. The role of physical activity on the need for revision total knee arthroplasty in individuals with osteoarthritis of the knee [dissertation]. [Pittsburgh (PA)]: University of Pittsburgh; 2001. 436 p.",
+                        "is_reference": true,
                         "reftype": "Thesis",
                         "authors":  [
                             {{   "surname": "Jones", "fname": "DL" }},
@@ -143,6 +155,7 @@ def create_prompt_reference(references):
                 }},
     {{
                     "full_text": "Schimper, A. F. W. 1903. Plant geography upon a physiological basis. Clarendon Press. Oxford, UK. 839 pp.",
+                    "is_reference": true,
                     "reftype": "book",
                     "authors":[
                         {{   "surname": "Schimper", "fname": "A. F. W." }},
@@ -169,6 +182,7 @@ def create_prompt_reference(references):
                 }},
     {{
                     "full_text": "Hernández-López, L. 2019. Las especies endémicas de plantas en el estado de Jalisco: su distribución y conservación. Comisión Nacional para el Conocimiento y Uso de la Biodiversidad (CONABIO). Cd. Mx., México. https://doi.org/10.15468/ktvqds (consultado diciembre de 2019).",
+                    "is_reference": true,
                     "reftype": "data",
                     "authors":[
                         {{   "surname": "Hernández-López", "fname": "L." }},
@@ -182,6 +196,7 @@ def create_prompt_reference(references):
                 }},
     {{
                     "full_text": "Lucas Leão; Perobelli, Fernando Salgueiro; Ribeiro, Hilton Manoel Dias, 2024, Data for: Ação Coletiva Institucional e Consórcio Públicos Intermunicipais no Brasil, DOI: 10.48331/scielodata.5Z4TMP, SciELO Data, V1, UNF:6:Neyjad4du3rFprhupCXizA== [fileUNF]. Disponível em: https://doi.org/10.48331/scielodata",
+                    "is_reference": true,
                     "reftype": "data",
                     "authors":[
                         {{   "surname": "Leão", "fname": "Lucas" }},
@@ -198,6 +213,7 @@ def create_prompt_reference(references):
                 }},
     {{
                     "full_text": "INAFED. 2010. Enciclopedia de los Municipios y Delegaciones de México: Jalisco. Instituto Nacional para el Federalismo y el Desarrollo Municipal. http://www.inafed.gob.mx/ work/enciclopedia/EMM21puebla/index.html (consultado diciembre de 2018).",
+                    "is_reference": true,
                     "reftype": "webpage",
                     "authors":[
                         {{   "collab": "INAFED" }},
@@ -210,6 +226,7 @@ def create_prompt_reference(references):
                 }},
     {{
                     "full_text": "COB - Comitê Olímpico Brasileiro. Desafio para o corpo. Disponível em: http://www.cob.org.br/esportes/esporte.asp?id=39. (Acesso em 10 abr 2010)",
+                    "is_reference": true,
                     "reftype": "webpage",
                     "authors":[
                         {{   "collab": "COB -Comitê Olímpico Brasileiro" }},
@@ -221,6 +238,7 @@ def create_prompt_reference(references):
                 }},
     {{
                     "full_text": "Nikon Corporation. 1991-2006. NIS- Elements, version 2.33. Tokio, Japón.",
+                    "is_reference": true,
                     "reftype": "software",
                     "authors":[
                         {{   "collab": "Nikon Corporation" }},
@@ -233,6 +251,7 @@ def create_prompt_reference(references):
                 }},
     {{
                     "full_text": "Hamric, Ann B.; Spross, Judith A.; Hanson, Charlene M. Advanced practice nursing: an integrative approach. 3rd ed. St. Louis (MO): Elsevier Saunders; c2005. 979 p.",
+                    "is_reference": true,
                     "reftype": "book",
                     "authors":[
                         {{   "surname": "Hamric", "fname": "Ann B." }},
@@ -248,6 +267,7 @@ def create_prompt_reference(references):
                 }},
     {{
                     "full_text": "Calkins BM, Mendeloff AI. The epidemiology of idiopathic inflammatory bowel disease. In: Kirsner JB, Shorter RG, eds. Inflammatory bowel disease, 4th ed. Baltimore: Williams & Wilkins. 1995:31-68.",
+                    "is_reference": true,
                     "reftype": "book",
                     "authors":[
                         {{   "surname": "Calkins", "fname": "BM" }},
@@ -268,6 +288,7 @@ def create_prompt_reference(references):
                 }},
     {{
                     "full_text": "Furton EJ, Dort V, editors. Addiction and compulsive behaviors. Proceedings of the 17th Workshop for Bishops; 1999; Dallas, TX. Boston: National Catholic Bioethics Center (US); 2000. 258 p.",
+                    "is_reference": true,
                     "reftype": "confproc",
                     "authors":[
                         {{   "surname": "Furton", "fname": "EJ" }},
@@ -281,6 +302,14 @@ def create_prompt_reference(references):
                     "organization": "National Catholic Bioethics Center (US)",
                     "org_location": "Boston",
                     "pages": "258 p"
+                }},
+    {{
+                    "full_text": "Caption Figures",
+                    "is_reference": false
+                }},
+    {{
+                    "full_text": "Author's Address.",
+                    "is_reference": false
                 }}
     ]
 

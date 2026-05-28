@@ -356,7 +356,10 @@ AFFILIATION_RESPONSE_FORMAT = {
 
 REFERENCE_MESSAGES = [
     {   'role': 'system',
-        'content': 'You are an assistant who distinguishes the metadata of a bibliographic reference and returns it in JSON format.'
+        'content': """You are an assistant who distinguishes the metadata of a bibliographic reference and returns it in JSON format.
+                      First determine whether the paragraph is a bibliographic reference.
+                      If the paragraph is not a bibliographic reference, do not analyze its metadata. Return only full_text and is_reference with value false.
+        """
     },
     {   'role': 'user',
         'content': """
@@ -365,6 +368,9 @@ REFERENCE_MESSAGES = [
     },
     {   'role': 'assistant',
         'content': json.dumps({
+                'full_text': 'Smith, J. (2020). Understanding AI. Journal of Technology, 15(3), 45-60. https://doi.org/10.1234/jtech.2020.015',
+                'is_reference': true,
+                'reftype': 'journal',
                 'authors': [
                                 {
                                     "name": "J.",
@@ -383,6 +389,17 @@ REFERENCE_MESSAGES = [
                 'doi': "10.1234/jtech.2020.015"
         })
     },
+    {   'role': 'user',
+        'content': """
+                        Figures Captions
+                   """
+    },
+    {   'role': 'assistant',
+        'content': json.dumps({
+            'full_text': 'Caption Figures',
+            'is_reference': false
+        })
+    }
 ]
 
 REFERENCE_RESPONSE_FORMAT = {
@@ -390,6 +407,9 @@ REFERENCE_RESPONSE_FORMAT = {
     'schema':{
         'type': 'object',
         'properties': {
+            'full_text': {'type': 'string'},
+            'is_reference': {'type': 'boolean'},
+            'reftype': {'type': 'string', 'enum': ['journal', 'thesis', 'book', 'data', 'webpage', 'software', 'confproc']},
             'authors': {'type': 'array',
                         'items': {
                                     'type': 'object',
