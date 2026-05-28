@@ -688,9 +688,9 @@ def get_xml(article_docx, data_front, data, data_back, xref_map=None):
             node_table_text = d["value"]["content"]
 
             # Quitar saltos de línea y espacios extra
-            node_table_text = re.sub(r"\s*\n\s*", "", node_table_text).replace(
-                "<br>", ""
-            )
+            node_table_text = re.sub(r"\s*\n\s*", "", node_table_text).replace("<br>","")
+            node_table_text = re.sub(r"<(?![/a-zA-Z_])", "&lt;", node_table_text)
+            node_table_text = node_table_text.replace("&nbsp;", " ")
             node_table_text = re.sub(r"&(?!\w+;|#\d+;)", "&amp;", node_table_text)
 
             tabla_element = parse_xml_fragment(node_table_text)
