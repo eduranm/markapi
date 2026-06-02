@@ -9,6 +9,7 @@ MESSAGES = [
         },
         {   'role': 'assistant',
             'content': json.dumps({
+                    'is_reference': 'true',
                     'reftype': 'journal',
                     'authors':  [
                         {   'surname': 'Bachman', 'fname': 'S.' },
@@ -33,6 +34,7 @@ MESSAGES = [
         },
         {   'role': 'assistant',
             'content': json.dumps({
+                    'is_reference': 'true',
                     'reftype': 'Thesis',
                     'authors':  [
                         {   'surname': 'Brunel', 'fname': 'J. F.' },
@@ -52,7 +54,8 @@ MESSAGES = [
             'content': 'Hernández-López, L. 1995. The endemic flora of Jalisco, Mexico: Centers of endemism and implications for conservation. Tesis de maestría. Universidad de Wisconsin. Madison, USA. 74 pp.'
         },
         {   'role': 'assistant',
-            'content': json.dumps({
+            'content': json.dumps({                
+                    'is_reference': 'true',
                     'reftype': 'Thesis',
                     'authors':  [
                         {   'surname': 'Hernández-López', 'fname': 'L.' },
@@ -73,6 +76,7 @@ MESSAGES = [
         {
             'role': 'assistant',
             'content': json.dumps({
+                'is_reference': 'true',
                 'reftype': 'book',
                 'authors':[
                     {   'surname': 'Schimper', 'fname': 'A. F. W.' },
@@ -92,6 +96,7 @@ MESSAGES = [
         {
             'role': 'assistant',
             'content': json.dumps({
+                'is_reference': 'true',
                 'reftype': 'book',
                 'authors':[
                     {   'surname': 'Correa', 'fname': 'M. D.' },
@@ -113,6 +118,7 @@ MESSAGES = [
         {
             'role': 'assistant',
             'content': json.dumps({
+                'is_reference': 'true',
                 'reftype': 'data',
                 'authors':[
                     {   'surname': 'Hernández-López', 'fname': 'L.' },
@@ -152,6 +158,7 @@ MESSAGES = [
         {
             'role': 'assistant',
             'content': json.dumps({
+                'is_reference': 'true',
                 'reftype': 'software',
                 'authors':[
                     {   'collab': 'Nikon Corporation' },
@@ -171,6 +178,7 @@ MESSAGES = [
         {
             'role': 'assistant',
             'content': json.dumps({
+                    'is_reference': 'true',
                     'reftype': 'confproc',
                     'full_text': 'Furton EJ, Dort V, editors. Addiction and compulsive behaviors. Proceedings of the 17th Workshop for Bishops; 1999; Dallas, TX. Boston: National Catholic Bioethics Center (US); 2000. 258 p.',
                     'authors':[
@@ -187,6 +195,28 @@ MESSAGES = [
                     'pages': '258 p'
             })
         },
+        {
+            'role': 'user',
+            'content': 'Caption Figures'
+        },
+        {
+            'role': 'assistant',
+            'content': json.dumps({
+                    'full_text': 'Caption Figures',
+                    'is_reference': 'false'
+                }),
+        },
+        {
+            'role': 'user',
+            'content': 'Author\'s Address.'
+        },
+        {
+            'role': 'assistant',
+            'content': json.dumps({
+                    'full_text': 'Author\'s Address.',
+                    'is_reference': 'false'
+                }),
+        }
         ]
 
 RESPONSE_FORMAT = {
@@ -194,6 +224,7 @@ RESPONSE_FORMAT = {
         'schema':{
             'type': 'object',
             'properties': {
+                'is_reference': {'type': 'boolean'},
                 'reftype': {'type': 'string', 'enum': ['journal', 'thesis', 'book', 'data', 'webpage', 'software', 'confproc']},
                 'authors': {'type': 'array',
                             'items': {
@@ -205,7 +236,7 @@ RESPONSE_FORMAT = {
                                         }
                                 }
                             },
-                "full_text": {"type": "integer"},
+                "full_text": {"type": "string"},
                 "date": {"type": "integer"},
                 "title": {"type": "string"},
                 "chapter": {"type": "string"},
