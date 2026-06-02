@@ -471,6 +471,7 @@ class ArticleDocxMarkup(CommonControlField, ClusterableModel):
     spsversion = models.TextField(_("Sps version"), null=True, blank=True)
     artdate = models.DateField(_("Artdate"), null=True, blank=True)
     ahpdate = models.DateField(_("Ahpdate"), null=True, blank=True)
+    dateiso = models.TextField(_("Dateiso"), null=True, blank=True)
 
     file_xml = models.FileField(
         null=True,
