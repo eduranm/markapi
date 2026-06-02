@@ -340,7 +340,7 @@ AFFILIATION_RESPONSE_FORMAT = {
                                             'state': {'type': 'string'},
                                             'code_country': {'type': 'string'},
                                             'name_country': {'type': 'string'},
-                                            'text_aff': {'type': 'text'}
+                                            'text_aff': {'type': 'string'}
                                         },
                                         "required": [
                                             "aff", "char", "orgname", "orgdiv1", "orgdiv2",
@@ -369,7 +369,7 @@ REFERENCE_MESSAGES = [
     {   'role': 'assistant',
         'content': json.dumps({
                 'full_text': 'Smith, J. (2020). Understanding AI. Journal of Technology, 15(3), 45-60. https://doi.org/10.1234/jtech.2020.015',
-                'is_reference': true,
+                'is_reference': 'true',
                 'reftype': 'journal',
                 'authors': [
                                 {
@@ -397,7 +397,7 @@ REFERENCE_MESSAGES = [
     {   'role': 'assistant',
         'content': json.dumps({
             'full_text': 'Caption Figures',
-            'is_reference': false
+            'is_reference': 'false'
         })
     }
 ]
