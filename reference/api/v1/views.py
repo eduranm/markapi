@@ -40,7 +40,7 @@ class ReferenceViewSet(
             except Reference.DoesNotExist:
                 new_reference = Reference.objects.create(
                     mixed_citation=post_reference,
-                    status=ReferenceStatus.CREATING,
+                    estatus=ReferenceStatus.CREATING,
                     creator=self.request.user,
                 )
 
